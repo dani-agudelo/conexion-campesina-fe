@@ -6,17 +6,17 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import { LoginPage } from './pages/Login';
-// import { RegisterPage } from './pages/Register';
+import { RegisterPage } from './pages/Register';
 
 const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />
   },
-  // {
-  //   path: '/registro',
-  //   element: <RegisterPage />
-  // },
+  {
+    path: '/registro',
+    element: <RegisterPage />
+  },
   // {
   //   path: '*',
   //   element: <NotFoundPage />,

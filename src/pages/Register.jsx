@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
-import { SignUpCard } from '../components/auth/register/SignUpCard';
+import { SignUpCard } from '../components/auth/register/Card';
 
 const RegisterPage = () => {
   return (

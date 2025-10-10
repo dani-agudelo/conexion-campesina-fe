@@ -2,18 +2,16 @@ import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
-import Checkbox from '@mui/material/Checkbox';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import ForgotPassword from './ForgotPassword';
-import { SitemarkIcon } from './CustomIcons';
-import { Link as RouterLink } from 'react-router-dom';
-
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import { SitemarkIcon } from '../login/CustomIcons';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -59,52 +57,32 @@ const darkInputStyles = {
     },
 };
 
-const SignInCard = () => {
-    const [emailError, setEmailError] = useState(false);
-    const [emailErrorMessage, setEmailErrorMessage] = useState('');
-    const [passwordError, setPasswordError] = useState(false);
-    const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
-    const [open, setOpen] = useState(false);
-
-    const handleClickOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+const SignUpCard = () => {
+    const [errors, setErrors] = useState({});
+    const [role, setRole] = useState('buyer');
 
     const handleSubmit = (event) => {
-        if (emailError || passwordError) {
-            event.preventDefault();
-            return;
-        }
+        event.preventDefault();
+
         const data = new FormData(event.currentTarget);
-        console.log({
+        const values = {
+            fullName: data.get('fullName'),
             email: data.get('email'),
             password: data.get('password'),
-        });
-    };
+            role,
+        };
 
-    const validateInputs = () => {
-        const email = document.getElementById('email');
-        const password = document.getElementById('password');
-        let isValid = true;
+        const newErrors = {};
+        if (!values.fullName) newErrors.fullName = 'Full name is required';
+        if (!values.email || !/\S+@\S+\.\S+/.test(values.email))
+            newErrors.email = 'Please enter a valid email';
+        if (!values.password || values.password.length < 6)
+            newErrors.password = 'Password must be at least 6 characters';
 
-        if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-            setEmailError(true);
-            setEmailErrorMessage('Please enter a valid email address.');
-            isValid = false;
-        } else {
-            setEmailError(false);
-            setEmailErrorMessage('');
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length === 0) {
+            console.log('Register data:', values);
         }
-
-        if (!password.value || password.value.length < 6) {
-            setPasswordError(true);
-            setPasswordErrorMessage('Password must be at least 6 characters long.');
-            isValid = false;
-        } else {
-            setPasswordError(false);
-            setPasswordErrorMessage('');
-        }
-
-        return isValid;
     };
 
     return (
@@ -122,7 +100,7 @@ const SignInCard = () => {
                     textAlign: 'center',
                 }}
             >
-                Inicio de sesión
+                Crear una cuenta
             </Typography>
 
             <Box
@@ -132,17 +110,15 @@ const SignInCard = () => {
                 sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
             >
                 <FormControl>
-                    <FormLabel htmlFor="email" sx={{ color: '#ccc' }}>
-                        Correo
+                    <FormLabel htmlFor="fullName" sx={{ color: '#ccc' }}>
+                        Nombre completo
                     </FormLabel>
                     <TextField
-                        error={emailError}
-                        helperText={emailErrorMessage}
-                        id="email"
-                        type="email"
-                        name="email"
-                        placeholder="tucorreo@email.com"
-                        autoComplete="email"
+                        error={!!errors.fullName}
+                        helperText={errors.fullName}
+                        id="fullName"
+                        name="fullName"
+                        placeholder="John Doe"
                         required
                         fullWidth
                         variant="outlined"
@@ -151,63 +127,86 @@ const SignInCard = () => {
                 </FormControl>
 
                 <FormControl>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <FormLabel htmlFor="password" sx={{ color: '#ccc' }}>
-                            Contraseña
-                        </FormLabel>
-                    </Box>
+                    <FormLabel htmlFor="email" sx={{ color: '#ccc' }}>
+                        Correo
+                    </FormLabel>
                     <TextField
-                        error={passwordError}
-                        helperText={passwordErrorMessage}
-                        name="password"
-                        placeholder="••••••"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
+                        error={!!errors.email}
+                        helperText={errors.email}
+                        id="email"
+                        type="email"
+                        name="email"
+                        placeholder="your@email.com"
                         required
                         fullWidth
                         variant="outlined"
                         sx={darkInputStyles}
                     />
-                    <Link
-                        component="button"
-                        type="button"
-                        onClick={handleClickOpen}
-                        variant="body2"
-                        sx={{ alignSelf: 'end', mt: 3, color: '#90caf9' }}
-                    >
-                        Olvidaste tu contraseña?
-                    </Link>
                 </FormControl>
 
-                <ForgotPassword open={open} handleClose={handleClose} />
+                <FormControl>
+                    <FormLabel htmlFor="password" sx={{ color: '#ccc' }}>
+                        Contraseña
+                    </FormLabel>
+                    <TextField
+                        error={!!errors.password}
+                        helperText={errors.password}
+                        name="password"
+                        placeholder="••••••"
+                        type="password"
+                        id="password"
+                        required
+                        fullWidth
+                        variant="outlined"
+                        sx={darkInputStyles}
+                    />
+                </FormControl>
+
+                <FormControl>
+                    <FormLabel sx={{ color: '#ccc' }}>Selecciona un rol</FormLabel>
+                    <RadioGroup
+                        row
+                        name="role"
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        sx={{ justifyContent: 'center', color: '#fff' }}
+                    >
+                        <FormControlLabel
+                            value="producer"
+                            control={<Radio sx={{ color: '#90caf9' }} />}
+                            label="Productor"
+                        />
+                        <FormControlLabel
+                            value="buyer"
+                            control={<Radio sx={{ color: '#90caf9' }} />}
+                            label="Comprador"
+                        />
+                    </RadioGroup>
+                </FormControl>
 
                 <Button
                     type="submit"
                     fullWidth
                     variant="contained"
-                    onClick={validateInputs}
                     sx={{
-                        mt: 2,
+                        mt: 1,
                         bgcolor: '#1976d2',
                         '&:hover': { bgcolor: '#1565c0' },
                         borderRadius: '8px',
                     }}
                 >
-                    Iniciar sesión
+                    Registrarse
                 </Button>
 
                 <Typography sx={{ textAlign: 'center', color: '#aaa' }}>
-                    No tienes una cuenta?{' '}
-                    <RouterLink to='/registro'>
-                        <Link href="/sign-up" variant="body2" sx={{ color: '#90caf9' }}>
-                            Registrarse
-                        </Link>
-                    </RouterLink>
+                    Ya tienes una cuenta?{' '}
+                    <Link href="/login" variant="body2" sx={{ color: '#90caf9' }}>
+                        Iniciar sesión
+                    </Link>
                 </Typography>
             </Box>
         </Card>
     );
 };
 
-export { SignInCard };
+export { SignUpCard };
