@@ -136,7 +136,7 @@ const SignUpCard = () => {
                         id="email"
                         type="email"
                         name="email"
-                        placeholder="your@email.com"
+                        placeholder="tucorreo@email.com"
                         required
                         fullWidth
                         variant="outlined"
