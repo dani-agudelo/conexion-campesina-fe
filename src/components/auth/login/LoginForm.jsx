@@ -31,7 +31,7 @@ const LoginForm = ({ onSubmit }) => {
 
       <p className="register-text">
         ¿No tienes una cuenta?
-        <a className="link" href="/registro"> Regístrate</a>
+        <a className="link" href="/register"> Regístrate</a>
       </p>
     </>
   );

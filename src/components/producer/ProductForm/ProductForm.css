@@ -1,0 +1,340 @@
+.product-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.product-form {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.product-form__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 24px;
+}
+
+.product-form__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.product-form__close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #6c757d;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.product-form__close-btn:hover {
+  background: #f8f9fa;
+  color: #495057;
+}
+
+.product-form__close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.product-form__content {
+  padding: 0 24px 24px 24px;
+}
+
+.product-form__description {
+  color: #6c757d;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+}
+
+.product-form__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-form__field--half {
+  flex: 1;
+}
+
+.product-form__row {
+  display: flex;
+  gap: 16px;
+}
+
+.product-form__label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.product-form__input,
+.product-form__select,
+.product-form__textarea {
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.product-form__input:focus,
+.product-form__select:focus,
+.product-form__textarea:focus {
+  outline: none;
+  border-color: #3FD411;
+  box-shadow: 0 0 0 3px rgba(63, 212, 17, 0.1);
+}
+
+.product-form__input--error,
+.product-form__textarea--error {
+  border-color: #dc3545;
+}
+
+.product-form__input--error:focus,
+.product-form__textarea--error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.product-form__input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.product-form__input-prefix,
+.product-form__input-suffix {
+  position: absolute;
+  color: #6c757d;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.product-form__input-prefix {
+  left: 16px;
+}
+
+.product-form__input-suffix {
+  right: 16px;
+}
+
+.product-form__input-group .product-form__input {
+  padding-left: 40px;
+  padding-right: 50px;
+}
+
+.product-form__textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.product-form__error {
+  color: #dc3545;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.product-form__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.product-form__cancel-btn {
+  background: white;
+  color: #6c757d;
+  border: 2px solid #e9ecef;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.product-form__cancel-btn:hover:not(:disabled) {
+  border-color: #3FD411;
+  color: #3FD411;
+}
+
+.product-form__cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.product-form__save-btn {
+  background: linear-gradient(135deg, #3FD411, #2bb80a);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(63, 212, 17, 0.3);
+}
+
+.product-form__save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(63, 212, 17, 0.4);
+}
+
+.product-form__save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.product-form__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .product-form-overlay {
+    padding: 15px;
+  }
+  
+  .product-form {
+    max-height: 95vh;
+  }
+  
+  .product-form__header {
+    padding: 20px 20px 0 20px;
+  }
+  
+  .product-form__content {
+    padding: 0 20px 20px 20px;
+  }
+  
+  .product-form__title {
+    font-size: 1.3rem;
+  }
+  
+  .product-form__row {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .product-form__actions {
+    flex-direction: column;
+  }
+  
+  .product-form__cancel-btn,
+  .product-form__save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-form-overlay {
+    padding: 10px;
+  }
+  
+  .product-form__header {
+    padding: 16px 16px 0 16px;
+  }
+  
+  .product-form__content {
+    padding: 0 16px 16px 16px;
+  }
+  
+  .product-form__title {
+    font-size: 1.2rem;
+  }
+  
+  .product-form__description {
+    font-size: 0.9rem;
+  }
+  
+  .product-form__form {
+    gap: 16px;
+  }
+  
+  .product-form__input,
+  .product-form__select,
+  .product-form__textarea {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+  
+  .product-form__input-group .product-form__input {
+    padding-left: 35px;
+    padding-right: 45px;
+  }
+  
+  .product-form__input-prefix {
+    left: 14px;
+  }
+  
+  .product-form__input-suffix {
+    right: 14px;
+  }
+}
