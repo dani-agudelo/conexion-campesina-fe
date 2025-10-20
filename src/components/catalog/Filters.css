@@ -1,0 +1,79 @@
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: #fff;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Input ocupa todo el espacio */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f1f1f1;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding-left: 0.4rem;
+  font-size: 0.9rem;
+  color: #333;
+  width: 100%;
+}
+
+/* Selects */
+.filters-bar select {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filters-bar select:hover {
+  border-color: #fff;
+}
+
+/* Botón verde */
+.filter-btn {
+  background-color: #3ED317;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.filter-btn:hover {
+  background-color: #36b615;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 100%;
+  }
+
+  .filters-bar select,
+  .filter-btn {
+    width: 100%;
+  }
+}
