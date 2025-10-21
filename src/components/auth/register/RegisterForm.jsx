@@ -1,18 +1,26 @@
 import { useState } from 'react';
 
 const RegisterForm = ({ onSubmit }) => {
-  const [accountType, setAccountType] = useState('consumer');
+  const [accountType, setAccountType] = useState('CLIENT');
 
   const handleAccountTypeChange = (type) => {
     setAccountType(type);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSubmit) {
-      onSubmit(e, accountType);
+  const handleSubmit = (formData) => {
+    const fullName =  formData.get('fullName')
+    const email =  formData.get('email')
+    const password =  formData.get('password')
+
+    const payload = {
+      fullName,
+      email,
+      password,
+      role: accountType
     }
-  };
+
+    onSubmit?.(payload)
+  }
 
   return (
     <>
@@ -20,44 +28,48 @@ const RegisterForm = ({ onSubmit }) => {
       
       <div className="account-type-selector">
         <button 
-          className={`type-button ${accountType === 'consumer' ? 'active' : ''}`}
+          className={`type-button ${accountType === 'CLIENT' ? 'active' : ''}`}
           type="button"
-          onClick={() => handleAccountTypeChange('consumer')}
+          onClick={() => handleAccountTypeChange('CLIENT')}
         >
           Consumidor
         </button>
         <button 
-          className={`type-button ${accountType === 'producer' ? 'active' : ''}`}
+          className={`type-button ${accountType === 'PRODUCER' ? 'active' : ''}`}
           type="button"
-          onClick={() => handleAccountTypeChange('producer')}
+          onClick={() => handleAccountTypeChange('PRODUCER')}
         >
           Productor
         </button>
       </div>
 
-      <form className="register-form" onSubmit={handleSubmit}>
+      <form className="register-form" action={handleSubmit}>
         <input 
           className="text-input" 
           type="text" 
-          placeholder="Nombre completo" 
+          placeholder="Nombre completo"
+          name='fullName'
           required 
         />
         <input 
           className="text-input" 
           type="email" 
           placeholder="Correo electrónico" 
+          name='email'
           required 
         />
         <input 
           className="text-input" 
           type="password" 
           placeholder="Contraseña" 
+          name='password'
           required 
         />
         <input 
           className="text-input" 
           type="password" 
           placeholder="Confirmar contraseña" 
+          name='confirmedPassword'
           required 
         />
         
