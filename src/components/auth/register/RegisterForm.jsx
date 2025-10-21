@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { UserRole } from '../../../types/enums'
 
 const RegisterForm = ({ onSubmit }) => {
-  const [accountType, setAccountType] = useState('CLIENT');
+  const [accountType, setAccountType] = useState(UserRole.CLIENT);
 
   const handleAccountTypeChange = (type) => {
     setAccountType(type);
@@ -28,16 +29,16 @@ const RegisterForm = ({ onSubmit }) => {
       
       <div className="account-type-selector">
         <button 
-          className={`type-button ${accountType === 'CLIENT' ? 'active' : ''}`}
+          className={`type-button ${accountType === UserRole.CLIENT ? 'active' : ''}`}
           type="button"
-          onClick={() => handleAccountTypeChange('CLIENT')}
+          onClick={() => handleAccountTypeChange(UserRole.CLIENT)}
         >
           Consumidor
         </button>
-        <button 
-          className={`type-button ${accountType === 'PRODUCER' ? 'active' : ''}`}
+        <button
+          className={`type-button ${accountType === UserRole.PRODUCER ? 'active' : ''}`}
           type="button"
-          onClick={() => handleAccountTypeChange('PRODUCER')}
+          onClick={() => handleAccountTypeChange(UserRole.PRODUCER)}
         >
           Productor
         </button>
