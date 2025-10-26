@@ -1,13 +1,25 @@
 import './Login.css';
+import { useMutation } from '@tanstack/react-query';
+import { login } from '../../../services/auth';
 import { LoginForm } from './LoginForm';
 
 const Login = () => {
   const heroImage =
     'https://media.istockphoto.com/id/543212762/es/foto/tractor-en-el-campo-de-primavera-relaciones-sean.jpg?s=612x612&w=0&k=20&c=ua9ZJb046xHKUDsRW2okFfKYJyNd12RMXZ8vESdjUHc=';
 
-  const handleSubmit = (e) => {
-    // Aquí irá la lógica de autenticación
-    console.log('Login submitted');
+  const mutation = useMutation({
+    mutationFn: loginData => login(loginData),
+    onSuccess: (data) => {
+      const { token } = data;
+      localStorage.setItem('token', token)
+    },
+    onError: error => {
+      console.log('Error al iniciar sesión: ', error);
+    },
+  });
+
+  const handleSubmit = data => {
+    mutation.mutate(data);
   };
 
   return (

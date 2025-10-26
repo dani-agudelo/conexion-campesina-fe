@@ -1,10 +1,10 @@
 import Filters from './Filters'
 import './ProductsHeader.css'
 
-const ProductsHeader = ({ changeFilters }) => {
+const ProductsHeader = () => {
   return (
     <header className="products-header">
-      <Filters changeFilters={changeFilters} />
+      <Filters />
     </header>
   )
 }

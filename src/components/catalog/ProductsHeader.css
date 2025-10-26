@@ -1,22 +1,6 @@
 .products-header {
   width: 100%;
-  background-color: transparent; 
-  padding: 1rem 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
-.header-info h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-.header-info p {
-  color: #4b4b4b;
-  margin-top: 0.3rem;
-  font-size: 0.95rem;
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+  padding: 0 1rem;
 }

@@ -5,11 +5,14 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts"
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -40,7 +43,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <CssBaseline enableColorScheme />
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <CssBaseline enableColorScheme />
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </StrictMode>
 );

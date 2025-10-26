@@ -1,10 +1,21 @@
 import './Register.css';
+import { useMutation } from '@tanstack/react-query';
+import { register } from '../../../services/auth';
 import { RegisterForm } from './RegisterForm';
 
 const Register = () => {
-  const handleSubmit = (e, accountType) => {
-    // Aquí irá la lógica de registro
-    console.log('Register submitted', accountType);
+  const mutation = useMutation({
+    mutationFn: registerData => register(registerData),
+    onSuccess: () => {
+      console.log('Cuenta creada');
+    },
+    onError: error => {
+      console.log('Error al crear la cuenta: ', error);
+    },
+  });
+
+  const handleSubmit = data => {
+    mutation.mutate(data);
   };
 
   return (

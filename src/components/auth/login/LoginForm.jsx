@@ -1,9 +1,11 @@
 const LoginForm = ({ onSubmit }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSubmit) {
-      onSubmit(e);
-    }
+  const handleSubmit = (formData) => {
+
+    const email = formData.get('email');
+    const password = formData.get('password');
+
+    onSubmit?.({ email, password })
+
   };
 
   return (
@@ -11,7 +13,7 @@ const LoginForm = ({ onSubmit }) => {
       <h1 className="login-title">Bienvenido de nuevo</h1>
       <p className="login-subtitle">Inicia sesión para acceder a tu cuenta.</p>
 
-      <form className="login-form" onSubmit={handleSubmit}>
+      <form className="login-form" action={handleSubmit}>
         <label className="field-label" htmlFor="email">Nombre de usuario o correo</label>
         <input className="text-input" id="email" name="email" type="email" placeholder="tu@email.com" />
 

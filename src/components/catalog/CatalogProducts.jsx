@@ -1,27 +1,48 @@
-import { AddToCartIcon } from '../icons'
-import "./Products.css"
+import ProductCard from './ProductCard'
+import './Products.css'
+import { useQuery } from '@tanstack/react-query'
+import { fetcher } from '../../lib/http'
 
-const CatalogProducts = ({ products }) => {
+const SkeletonCard = () => (
+  <article className="product-card skeleton-card">
+    <div className="skeleton skeleton-image"></div>
+    <div className="skeleton skeleton-title"></div>
+    <div className="skeleton skeleton-text"></div>
+    <div className="skeleton skeleton-price"></div>
+    <div className="skeleton skeleton-btn"></div>
+  </article>
+)
+
+const CatalogProducts = () => {
+  const useProducts = () => {
+    return useQuery({
+      queryKey: ['offeredProducts'],
+      queryFn: () => fetcher('product/offer'),
+      staleTime: 1000 * 60 * 5,
+    })
+  }
+
+  const { data: products = [], isLoading, isError } = useProducts()
+
+  if (isLoading) {
+    return (
+      <main className="products-container">
+        <section className="products-grid">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </section>
+      </main>
+    )
+  }
+
+  if (isError) return <p>Error al cargar productos.</p>
+
   return (
     <main className="products-container">
       <section className="products-grid">
         {products.map((product) => (
-          <article key={product.id} className="product-card">
-            <div className="product-tag">{product.category}</div>
-
-            <div className="product-image">
-              <img src={product.thumbnail} alt={product.title} />
-            </div>
-
-            <div className="product-info">
-              <h2>{product.title}</h2>
-              <p>{product.description}</p>
-              <span className="price">$ {product.price}</span>
-              <button className="add-btn">
-                <AddToCartIcon /> Agregar al Carrito
-              </button>
-            </div>
-          </article>
+          <ProductCard key={product.id} product={product} />
         ))}
       </section>
     </main>

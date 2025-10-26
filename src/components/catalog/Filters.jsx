@@ -1,15 +1,22 @@
 import './Filters.css'
 import { useState } from 'react'
 import { Search } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { fetcher } from '../../lib/http'
 
-const Filters = ({ changeFilters }) => {
+const Filters = () => {
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('Todas')
+  // const [category, setCategory] = useState('Todas')
   const [sort, setSort] = useState('Relevancia')
 
-  const handleFilter = () => {
-    changeFilters({ query, category, sort })
-  }
+  const [category, setCategory] = useState('Todas')
+
+  //cargar las categorias desde el backend
+  const { data: categories = [], isLoading, isError } = useQuery({
+    queryKey: ['categories'], // cache key
+    queryFn: () => fetcher('product/base/categories'), 
+    staleTime: 1000 * 60 * 5, 
+  })
 
   return (
     <div className="filters-bar">
@@ -23,12 +30,23 @@ const Filters = ({ changeFilters }) => {
         />
       </div>
 
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="Todas">Categoría</option>
-        <option value="Granos">Granos</option>
-        <option value="Frutas">Frutas</option>
-        <option value="Verduras">Verduras</option>
-        <option value="Lácteos">Lácteos</option>
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        disabled={isLoading || isError}
+      >
+        <option value="Todas">Todas las categorías</option>
+
+        {isLoading && <option>Cargando...</option>}
+        {isError && <option>Error al cargar</option>}
+
+        {!isLoading &&
+          !isError &&
+          categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat.charAt(0) + cat.slice(1).toLowerCase().replaceAll('_', ' ')}
+            </option>
+          ))}
       </select>
 
       <select value={sort} onChange={(e) => setSort(e.target.value)}>
@@ -38,7 +56,7 @@ const Filters = ({ changeFilters }) => {
         <option value="NombreAZ">Nombre (A-Z)</option>
       </select>
 
-      <button className="filter-btn" onClick={handleFilter}>
+      <button className="filter-btn">
         Filtrar
       </button>
     </div>

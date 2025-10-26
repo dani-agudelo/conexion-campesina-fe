@@ -1,79 +1,89 @@
+/* ===== CONTENEDOR DE FILTROS ===== */
 .filters-bar {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1rem;
   background: #fff;
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  max-width: 900px;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
-/* Input ocupa todo el espacio */
+/* ===== BUSCADOR ===== */
 .search-box {
   display: flex;
   align-items: center;
-  background: #f1f1f1;
-  border-radius: 8px;
-  padding: 0.4rem 0.8rem;
   flex: 1;
-  min-width: 300px;
+  background: #f7f7f7;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #e3e3e3;
 }
 
 .search-box input {
+  flex: 1;
   border: none;
-  background: transparent;
   outline: none;
-  padding-left: 0.4rem;
-  font-size: 0.9rem;
+  background: transparent;
+  margin-left: 0.5rem;
+  font-size: 0.95rem;
   color: #333;
-  width: 100%;
 }
 
-/* Selects */
+.search-box input::placeholder {
+  color: #aaa;
+}
+
+/* ===== SELECTS ===== */
 .filters-bar select {
-  background: #fff;
-  border: 1px solid #ddd;
+  padding: 0.6rem 0.8rem;
   border-radius: 8px;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.9rem;
+  border: 1px solid #e3e3e3;
+  background: #fff;
+  font-size: 0.95rem;
   color: #333;
   cursor: pointer;
-  transition: border-color 0.2s;
+  min-width: 160px;
+  transition: border 0.2s ease;
 }
 
-.filters-bar select:hover {
-  border-color: #fff;
+.filters-bar select:focus {
+  border-color: #32cd32;
+  outline: none;
 }
 
-/* Botón verde */
+/* ===== BOTÓN FILTRAR ===== */
 .filter-btn {
-  background-color: #3ED317;
-  color: white;
+  background-color: #3FD411;
+  color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 0.5rem 1.2rem;
+  padding: 0.6rem 1.4rem;
   font-weight: 600;
-  font-size: 0.9rem;
   cursor: pointer;
+  font-size: 0.95rem;
   transition: background 0.2s ease;
 }
 
 .filter-btn:hover {
-  background-color: #36b615;
+  background-color: #28a745;
 }
 
-/* Responsive */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .filters-bar {
     flex-direction: column;
     align-items: stretch;
-    max-width: 100%;
   }
 
   .filters-bar select,
   .filter-btn {
+    width: 100%;
+  }
+
+  .search-box {
     width: 100%;
   }
 }
