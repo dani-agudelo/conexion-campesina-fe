@@ -11,6 +11,7 @@ export async function fetcher(url, options = {}) {
   const token = localStorage.getItem('token');
 
   const fetchUrl = `${API_URL}/${url}`;
+  console.log('Fetching URL:', fetchUrl);
 
   const config = {
     method,

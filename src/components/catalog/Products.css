@@ -1,0 +1,225 @@
+/* ...existing code... */
+
+@font-face {
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Medium.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Apply globally */
+html, body {
+  font-family: "Google Sans", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* ...existing code... */
+.products-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: "Google Sans", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.8rem;
+}
+
+/* === CARD === */
+.product-card {
+  position: relative;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* === Imagen === */
+.product-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #f6f6f6;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* === Etiqueta categoría === */
+.product-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #76c656;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* === Contenido === */
+.product-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1rem;
+}
+
+
+/* Título y descripción */
+.product-card h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0.4rem 0 0.3rem 0;
+}
+
+.product-card p {
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  margin-bottom: 0.8rem;
+  min-height: 48px; 
+}
+
+/* === Botón === */
+.add-btn {
+  width: 100%;
+  background: #3FD411;
+  color: #fff;
+  border: none;
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.add-btn:hover {
+  background-color: #28a745;
+  transform: translateY(-2px);
+}
+
+.add-btn:active {
+  transform: translateY(0);
+}
+
+
+.price {
+  font-weight: bold;
+  color: #3FD411;
+  margin: 0.25rem 0;
+  font-size: 1.1rem;
+}
+
+.producer {
+  margin: 0; 
+  color: #4CAF50;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+.producer-link {
+  color: #3FD411;
+  text-decoration: none;
+}
+
+.product-card p {
+  margin-bottom: 0rem;
+}
+
+.skeleton {
+  display: inline-block;
+  height: 0.9rem;
+  width: 120px;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f8f8f8 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Skeleton loading styles --- */
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.05);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f8f8f8 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 160px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-title {
+  width: 80%;
+  height: 16px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-text {
+  width: 90%;
+  height: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-price {
+  width: 50%;
+  height: 14px;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.skeleton-btn {
+  width: 80%;
+  height: 36px;
+  border-radius: 6px;
+}

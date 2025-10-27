@@ -10,6 +10,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProducerProducts from "./pages/ProducerProducts";
+import CatalogPage from "./pages/CatalogProducts";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/product-management",
     element: <ProducerProducts />,
+  },
+  {
+    path: "/catalog",
+    element: <CatalogPage />,
   },
   {
     path: "/",
