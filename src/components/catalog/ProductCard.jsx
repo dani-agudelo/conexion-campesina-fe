@@ -40,9 +40,9 @@ const ProductCard = ({ product }) => {
                     producer && (
                         <p className="producer">
                             Vendido por:{' '}
-                            <a className="producer-link" href="#">
+                            <span className="producer-link">
                                 {producer.fullName}
-                            </a>
+                            </span>
                         </p>
                     )
                 )}
