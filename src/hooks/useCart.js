@@ -93,7 +93,7 @@ const useCart = () => {
       status: "PENDING",
       totalAmount: totalAmount,
       totalItems: totalItems,
-      address: `${addressData.address}, ${addressData.city}, ${addressData.department}${addressData.postalCode ? ` - ${addressData.postalCode}` : ''}${addressData.additionalInfo ? `. ${addressData.additionalInfo}` : ''}`,
+      address: `${addressData.address}, ${addressData.city}, ${addressData.department} - ${addressData.postalCode}`,
       orderDetails: cartItems.map(item => ({
         productOfferId: item.productOfferId,
         quantity: item.quantity,
