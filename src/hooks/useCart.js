@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useMutation } from '@tanstack/react-query';
+import { fetcher } from '../lib/http';
 
 const useCart = () => {
   const [cartItems, setCartItems] = useState([
@@ -40,6 +42,27 @@ const useCart = () => {
   const [loading, setLoading] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
+  // Mutation para crear la orden usando fetcher
+  const createOrderMutation = useMutation({
+    mutationFn: (orderData) => {
+      return fetcher('orders', {
+        method: 'POST',
+        body: orderData,
+      });
+    },
+    onSuccess: (data) => {
+      console.log('Orden creada exitosamente:', data);
+      // Limpiar el carrito después de crear la orden
+      setCartItems([]);
+      setIsAddressModalOpen(false);
+      alert(`¡Orden creada exitosamente! ID: ${data.id}`);
+    },
+    onError: (error) => {
+      console.error('Error al crear la orden:', error);
+      alert('Error al procesar la orden. Por favor intenta de nuevo.');
+    },
+  });
+
   const handleUpdateQuantity = (itemId, newQuantity) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
@@ -56,22 +79,32 @@ const useCart = () => {
 
   const handleCheckout = () => {
     console.log("Proceder al pago con:", cartItems);
-    // Abrir el modal de dirección
     setIsAddressModalOpen(true);
   };
 
-  const handleAddressSave = (addressData) => {
+  const handleAddressSave = async (addressData) => {
     console.log("Dirección guardada:", addressData);
-    console.log("Creando orden con:", { cartItems, address: addressData });
     
-    // Aquí puedes llamar a tu API para crear la orden
-    // createOrder({ cartItems, address: addressData });
-    
-    // Cerrar el modal
-    setIsAddressModalOpen(false);
-    
-    // Opcional: limpiar el carrito después de crear la orden
-    // setCartItems([]);
+
+    const totalAmount = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+    const orderPayload = {
+      status: "PENDING",
+      totalAmount: totalAmount,
+      totalItems: totalItems,
+      address: `${addressData.address}, ${addressData.city}, ${addressData.department}${addressData.postalCode ? ` - ${addressData.postalCode}` : ''}${addressData.additionalInfo ? `. ${addressData.additionalInfo}` : ''}`,
+      orderDetails: cartItems.map(item => ({
+        productOfferId: item.productOfferId,
+        quantity: item.quantity,
+        price: item.price,
+        subtotal: item.subtotal,
+      })),
+    };
+
+    console.log("Payload a enviar:", orderPayload);
+
+    createOrderMutation.mutate(orderPayload);
   };
 
   const handleCloseAddressModal = () => {
@@ -84,10 +117,9 @@ const useCart = () => {
     // Aquí puedes agregar la navegación a la página de productos
   };
 
-
   return {
     cartItems,
-    loading,
+    loading: loading || createOrderMutation.isPending,
     isAddressModalOpen,
     handleUpdateQuantity,
     handleRemoveItem,
