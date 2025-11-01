@@ -5,12 +5,13 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts";
+import CartPage from "./pages/Cart";
 
 const queryClient = new QueryClient();
 
@@ -28,13 +29,17 @@ const router = createBrowserRouter([
     element: <ProducerProducts />,
   },
   {
+    path: "/cart",
+    element: <CartPage />,
+  },
+  {
     path: "/catalog",
     element: <CatalogPage />,
   },
   {
     path: "/",
     element: <Navigate to="/login" replace />,
-  }
+  },
   // {
   //   path: '*',
   //   element: <NotFoundPage />,

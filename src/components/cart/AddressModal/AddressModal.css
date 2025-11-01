@@ -1,0 +1,277 @@
+.address-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.address-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.address-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.address-modal__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.address-modal__close-btn {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.address-modal__close-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.address-modal__close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.address-modal__content {
+  padding: 24px;
+}
+
+.address-modal__description {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.address-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.address-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.address-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.address-modal__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.address-modal__input,
+.address-modal__select,
+.address-modal__textarea {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.address-modal__input:focus,
+.address-modal__select:focus,
+.address-modal__textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.address-modal__input--error,
+.address-modal__select--error,
+.address-modal__textarea--error {
+  border-color: #ef4444;
+}
+
+.address-modal__input--error:focus,
+.address-modal__select--error:focus,
+.address-modal__textarea--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.address-modal__input:disabled,
+.address-modal__select:disabled,
+.address-modal__textarea:disabled {
+  background-color: #f9fafb;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.address-modal__select {
+  cursor: pointer;
+}
+
+.address-modal__textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.address-modal__error {
+  font-size: 13px;
+  color: #ef4444;
+  margin-top: 2px;
+}
+
+.address-modal__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.address-modal__cancel-btn,
+.address-modal__save-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.address-modal__cancel-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.address-modal__cancel-btn:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.address-modal__save-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.address-modal__save-btn:hover:not(:disabled) {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.address-modal__cancel-btn:disabled,
+.address-modal__save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.address-modal__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .address-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .address-modal__header {
+    padding: 20px 16px 12px;
+  }
+
+  .address-modal__title {
+    font-size: 20px;
+  }
+
+  .address-modal__content {
+    padding: 16px;
+  }
+
+  .address-modal__row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .address-modal__field--half {
+    width: 100%;
+  }
+
+  .address-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .address-modal__cancel-btn,
+  .address-modal__save-btn {
+    width: 100%;
+  }
+}
