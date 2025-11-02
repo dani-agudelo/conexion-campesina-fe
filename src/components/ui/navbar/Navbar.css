@@ -1,0 +1,187 @@
+/* --- Navbar general --- */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  font-family: 'Inter', sans-serif;
+}
+
+.navbar__left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* --- Logo --- */
+.navbar__logo {
+  font-weight: 900;
+  font-size: 22px;
+  color: #000;
+}
+
+/* --- Links --- */
+.navbar__links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #080808;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #2e7d32;
+}
+
+.nav-link.active {
+  color: #73ce66;
+  font-weight: bold;
+}
+
+/* --- Acciones  --- */
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+/* Carrito */
+.cart-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.cart-icon {
+  font-size: 20px;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 5px;
+}
+
+/* Perfil */
+.profile-circle {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #4caf50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-initial {
+  font-size: 14px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Perfil */
+.profile-wrapper {
+  position: relative;
+}
+
+.profile-circle {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #4caf50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-circle:hover {
+  background-color: #f6fff7;
+}
+
+.profile-initial {
+  font-size: 14px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* --- Dropdown --- */
+.profile-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 180px;
+  padding: 10px 0;
+  animation: fadeIn 0.15s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-info {
+  text-align: center;
+  padding: 5px 15px 10px;
+}
+
+.profile-name {
+  margin: 0;
+  font-weight: 600;
+  color: #222;
+  font-size: 14px;
+}
+
+.profile-role {
+  margin: 0;
+  color: #777;
+  font-size: 12px;
+}
+
+.dropdown-divider {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 5px 0;
+}
+
+.dropdown-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 15px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.dropdown-btn:hover {
+  background-color: #f4f4f4;
+}
+
+.dropdown-btn.logout {
+  color: #c62828;
+}
