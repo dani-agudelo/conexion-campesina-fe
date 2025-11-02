@@ -1,6 +1,7 @@
 .product-card {
   border-bottom: 1px solid #e9ecef;
   transition: background-color 0.2s ease;
+  display: table-row !important;
 }
 
 .product-card:hover {
@@ -13,6 +14,7 @@
 
 .product-card__product {
   padding: 16px 20px;
+  display: table-cell !important;
 }
 
 .product-card__product-info {
@@ -65,6 +67,7 @@
 .product-card__description {
   padding: 16px 20px;
   max-width: 350px;
+  display: table-cell !important;
 }
 
 .product-card__description-text {
@@ -81,6 +84,7 @@
 .product-card__price {
   padding: 16px 20px;
   text-align: right;
+  display: table-cell !important;
 }
 
 .product-card__price-amount {
@@ -98,6 +102,7 @@
 .product-card__quantity {
   padding: 16px 20px;
   text-align: center;
+  display: table-cell !important;
 }
 
 .product-card__quantity-amount {
@@ -114,6 +119,7 @@
 
 .product-card__actions {
   padding: 16px 20px;
+  display: table-cell !important;
 }
 
 .product-card__action-buttons {

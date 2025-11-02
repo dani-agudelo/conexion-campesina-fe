@@ -9,9 +9,6 @@ import {
 
 const MainLayout = () => {
     const setCurrentUser = useAuth(state => state.setCurrentUser);
-
-    console.lo
-
     const { isLoading, isError, data } = useUserQuery();
 
     if (isLoading) return <Spinner />;
