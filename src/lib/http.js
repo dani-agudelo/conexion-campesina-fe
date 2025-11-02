@@ -8,10 +8,11 @@ export async function fetcher(url, options = {}) {
     ...remainingProps
   } = options;
 
-  const token = localStorage.getItem('token');
+  const tokenData = JSON.parse(localStorage.getItem('token') ?? '{}');
+
+  const token = tokenData?.state?.token;
 
   const fetchUrl = `${API_URL}/${url}`;
-  console.log('Fetching URL:', fetchUrl);
 
   const config = {
     method,

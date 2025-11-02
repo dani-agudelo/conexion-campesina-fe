@@ -1,3 +1,5 @@
+import { fetcher } from "../lib/http";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const login = async (loginDto) => {
@@ -24,4 +26,8 @@ export const register = async (registerDto) => {
   })
 
   return await res.json()
+}
+
+export const getUser = async () => {
+  return await fetcher('auth/verify')
 }

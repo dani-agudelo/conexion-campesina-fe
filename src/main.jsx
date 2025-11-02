@@ -11,30 +11,45 @@ import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts";
+import { AuthLayout } from "./layouts/AuthLayout";
+import { MainLayout } from "./layouts/MainLayout";
+import { UserRole } from "./types/enums";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <LoginPage />,
+    element: <AuthLayout />,
+    children: [
+      { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
+    ]
   },
   {
-    path: "/register",
-    element: <RegisterPage />,
+    element: <MainLayout />,
+    children: [
+      {
+        path: "/product-management",
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+            <ProducerProducts />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/catalog",
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+            <CatalogPage />
+          </ProtectedRoute>
+        ),
+      },
+    ]
   },
-  {
-    path: "/product-management",
-    element: <ProducerProducts />,
-  },
-  {
-    path: "/catalog",
-    element: <CatalogPage />,
-  },
-  {
-    path: "/",
-    element: <Navigate to="/login" replace />,
-  }
+  { path: "/", element: <Navigate to="/login" replace /> },
+
+
   // {
   //   path: '*',
   //   element: <NotFoundPage />,
