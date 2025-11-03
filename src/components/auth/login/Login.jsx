@@ -6,6 +6,7 @@ import { LoginForm } from './LoginForm';
 import { useAuth } from '../../../state/auth';
 import { MAIN_ROUTES } from '../../../constants/pages/pages';
 import { useToken } from '../../../state/token';
+import { showErrorAlert } from '../../../utils/sweetAlert';
 
 const heroImage =
   'https://media.istockphoto.com/id/543212762/es/foto/tractor-en-el-campo-de-primavera-relaciones-sean.jpg?s=612x612&w=0&k=20&c=ua9ZJb046xHKUDsRW2okFfKYJyNd12RMXZ8vESdjUHc=';
@@ -21,6 +22,10 @@ const Login = () => {
   const mutation = useMutation({
     mutationFn: loginData => login(loginData),
     onSuccess: (data) => {
+      if (data.status && data.status !== 201) {
+        showErrorAlert(data.message);
+        return;
+      }
       const { token, user } = data;
       setToken(token);
       setCurrentUser(user);
@@ -29,6 +34,7 @@ const Login = () => {
     },
     onError: error => {
       console.log('Error al iniciar sesión: ', error);
+      showErrorAlert(error.message);
     },
   });
 
