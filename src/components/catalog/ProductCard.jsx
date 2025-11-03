@@ -1,9 +1,14 @@
+import { useState, useCallback } from 'react'
 import { AddToCartIcon } from '../icons'
 import { useQuery } from '@tanstack/react-query'
 import { fetcher } from '../../lib/http'
+import { useCart } from '../../state/cart'
+import QuantityModal from './QuantityModal'
 import './Products.css'
 
 const ProductCard = ({ product }) => {
+    const [showQuantityModal, setShowQuantityModal] = useState(false)
+    const addItem = useCart((state) => state.addItem)
 
     const useProducer = (producerId) => {
         return useQuery({
@@ -14,6 +19,18 @@ const ProductCard = ({ product }) => {
         })
     }
     const { data: producer, isLoading } = useProducer(product.producerId)
+
+    const handleAddToCart = useCallback((quantity) => {
+        addItem(product, quantity)
+    }, [product, addItem])
+
+    const handleOpenModal = useCallback(() => {
+        setShowQuantityModal(true)
+    }, [])
+
+    const handleCloseModal = useCallback(() => {
+        setShowQuantityModal(false)
+    }, [])
 
     return (
         <article className="product-card">
@@ -47,10 +64,21 @@ const ProductCard = ({ product }) => {
                     )
                 )}
 
-                <button className="add-btn">
+                <button 
+                    className="add-btn"
+                    onClick={handleOpenModal}
+                >
                     <AddToCartIcon /> Agregar al Carrito
                 </button>
             </div>
+
+            <QuantityModal
+                isOpen={showQuantityModal}
+                onClose={handleCloseModal}
+                onConfirm={handleAddToCart}
+                productName={product.name}
+                unit={product.unit}
+            />
         </article>
     )
 }
