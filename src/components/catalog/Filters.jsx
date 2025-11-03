@@ -1,22 +1,23 @@
 import './Filters.css'
-import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { fetcher } from '../../lib/http'
+import { useFilters } from '../../state/filters'
+import { useState } from 'react'
 
 const Filters = () => {
-  const [query, setQuery] = useState('')
-  // const [category, setCategory] = useState('Todas')
-  const [sort, setSort] = useState('Relevancia')
-
-  const [category, setCategory] = useState('Todas')
-
-  //cargar las categorias desde el backend
+  const { query, setQuery, category, setCategory, sort, setSort } = useFilters()
+  const [localQuery, setLocalQuery] = useState(query)
   const { data: categories = [], isLoading, isError } = useQuery({
-    queryKey: ['categories'], // cache key
-    queryFn: () => fetcher('product/base/categories'), 
-    staleTime: 1000 * 60 * 5, 
+    queryKey: ['categories'],
+    queryFn: () => fetcher('product/base/categories'),
+    staleTime: 1000 * 60 * 5,
   })
+
+  const handleFilter = () => {
+    // Aplica el texto escrito en el buscador al estado global
+    setQuery(localQuery)
+  }
 
   return (
     <div className="filters-bar">
@@ -25,8 +26,8 @@ const Filters = () => {
         <input
           type="text"
           placeholder="Buscar por producto o productor..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={localQuery}
+          onChange={(e) => setLocalQuery(e.target.value)}
         />
       </div>
 
@@ -56,7 +57,7 @@ const Filters = () => {
         <option value="NombreAZ">Nombre (A-Z)</option>
       </select>
 
-      <button className="filter-btn">
+      <button className="filter-btn" onClick={handleFilter}>
         Filtrar
       </button>
     </div>
