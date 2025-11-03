@@ -4,14 +4,19 @@ import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../../state/auth";
 import { ROLE_ACCESS } from "../../../constants/pages/pages";
 import { useToken } from "../../../state/token";
+import { useCart } from "../../../state/cart";
+import { CartModal } from "../../cart";
+import { UserRole } from "../../../types/enums";
 
 const Navbar = () => {
     const clearUser = useAuth((state) => state.clearUser);
     const currentUser = useAuth((state) => state.currentUser);
     const [openDropdown, setOpenDropdown] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
     const clearToken = useToken(state => state.clearToken);
+    const totalItems = useCart((state) => state.items.length);
 
 
     const handleSignOut = () => {
@@ -57,10 +62,16 @@ const Navbar = () => {
             </section>
 
             <div className="navbar__actions">
-                <div className="cart-container">
-                    <i className="cart-icon">🛒</i>
-                    <span className="cart-badge">3</span>
-                </div>
+                {currentUser.role === UserRole.CLIENT && (
+                    <div className="cart-container" onClick={() => setIsCartOpen(true)}>
+                        <i className="cart-icon">🛒</i>
+                        {totalItems > 0 && (
+                            <span className="cart-badge">{totalItems}</span>
+                        )}
+                    </div>
+                )}
+
+                <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
                 <div className="profile-wrapper" ref={dropdownRef}>
                     <div
