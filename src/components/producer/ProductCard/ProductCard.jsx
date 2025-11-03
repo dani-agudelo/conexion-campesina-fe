@@ -27,7 +27,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
           <div className="product-card__details">
             <h4 className="product-card__name">{product.name}</h4>
             <span className="product-card__category">
-              {product.category?.charAt(0).toUpperCase() + product.category?.slice(1) || 'Sin categoría'}
+              {product.productBase.category?.charAt(0).toUpperCase() + product.productBase.category?.slice(1) || 'Sin categoría'}
             </span>
           </div>
         </div>
