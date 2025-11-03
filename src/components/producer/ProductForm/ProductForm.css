@@ -129,7 +129,7 @@
 .product-form__select:focus,
 .product-form__textarea:focus {
   outline: none;
-  border-color: #3FD411;
+  border-color: #3fd411;
   box-shadow: 0 0 0 3px rgba(63, 212, 17, 0.1);
 }
 
@@ -205,8 +205,8 @@
 }
 
 .product-form__cancel-btn:hover:not(:disabled) {
-  border-color: #3FD411;
-  color: #3FD411;
+  border-color: #3fd411;
+  color: #3fd411;
 }
 
 .product-form__cancel-btn:disabled {
@@ -215,7 +215,7 @@
 }
 
 .product-form__save-btn {
-  background: linear-gradient(135deg, #3FD411, #2bb80a);
+  background: linear-gradient(135deg, #3fd411, #2bb80a);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -251,8 +251,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */
@@ -260,32 +264,32 @@
   .product-form-overlay {
     padding: 15px;
   }
-  
+
   .product-form {
     max-height: 95vh;
   }
-  
+
   .product-form__header {
     padding: 20px 20px 0 20px;
   }
-  
+
   .product-form__content {
     padding: 0 20px 20px 20px;
   }
-  
+
   .product-form__title {
     font-size: 1.3rem;
   }
-  
+
   .product-form__row {
     flex-direction: column;
     gap: 20px;
   }
-  
+
   .product-form__actions {
     flex-direction: column;
   }
-  
+
   .product-form__cancel-btn,
   .product-form__save-btn {
     width: 100%;
@@ -297,43 +301,43 @@
   .product-form-overlay {
     padding: 10px;
   }
-  
+
   .product-form__header {
     padding: 16px 16px 0 16px;
   }
-  
+
   .product-form__content {
     padding: 0 16px 16px 16px;
   }
-  
+
   .product-form__title {
     font-size: 1.2rem;
   }
-  
+
   .product-form__description {
     font-size: 0.9rem;
   }
-  
+
   .product-form__form {
     gap: 16px;
   }
-  
+
   .product-form__input,
   .product-form__select,
   .product-form__textarea {
     padding: 10px 14px;
     font-size: 0.9rem;
   }
-  
+
   .product-form__input-group .product-form__input {
     padding-left: 35px;
     padding-right: 45px;
   }
-  
+
   .product-form__input-prefix {
     left: 14px;
   }
-  
+
   .product-form__input-suffix {
     right: 14px;
   }

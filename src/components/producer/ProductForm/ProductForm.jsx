@@ -1,46 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import './ProductForm.css';
+import React, { useState, useEffect } from "react";
+import "./ProductForm.css";
+import { useProductBaseQuery } from "../../../hooks/query/useProductBase";
+import {UNITS} from '../../../types/enums';
 
 const ProductForm = ({ product, onSave, onClose }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    quantity: '',
-    unit: 'kg',
-    category: 'vegetales',
-    imageUrl: ''
+    productBaseId: "", 
+    name: "",
+    description: "",
+    price: "",
+    quantity: "",
+    unit: "KILOGRAMO",
+    imageUrl: "",
+    isAvailable: true,
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { data: productBases, isLoading: loadingBases, error: errorBases } = useProductBaseQuery();
+
   useEffect(() => {
     if (product) {
       setFormData({
-        name: product.name || '',
-        description: product.description || '',
-        price: product.price || '',
-        quantity: product.quantity || '',
-        unit: product.unit || 'kg',
-        category: product.category || 'vegetales',
-        imageUrl: product.imageUrl || ''
+        productBaseId: product.productBaseId || "",
+        name: product.name || "",
+        description: product.description || "",
+        price: product.price || "",
+        quantity: product.quantity || "",
+        unit: product.unit || "KILOGRAMO",
+        imageUrl: product.imageUrl || "",
+        isAvailable: product.isAvailable !== undefined ? product.isAvailable : true,
       });
     }
   }, [product]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    
+
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -48,26 +54,31 @@ const ProductForm = ({ product, onSave, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
+    if (!formData.productBaseId) {
+      newErrors.productBaseId = "Debes seleccionar un tipo de producto";
+    }
+
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre del producto es requerido';
+      newErrors.name = "El nombre del producto es requerido";
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es requerida';
+      newErrors.description = "La descripción es requerida";
     } else if (formData.description.length < 10) {
-      newErrors.description = 'La descripción debe tener al menos 10 caracteres';
+      newErrors.description =
+        "La descripción debe tener al menos 10 caracteres";
     }
 
     if (!formData.price || formData.price <= 0) {
-      newErrors.price = 'El precio debe ser mayor a 0';
+      newErrors.price = "El precio debe ser mayor a 0";
     }
 
     if (!formData.quantity || formData.quantity <= 0) {
-      newErrors.quantity = 'La cantidad debe ser mayor a 0';
+      newErrors.quantity = "La cantidad debe ser mayor a 0";
     }
 
     if (formData.imageUrl && !isValidUrl(formData.imageUrl)) {
-      newErrors.imageUrl = 'Ingresa una URL válida';
+      newErrors.imageUrl = "Ingresa una URL válida";
     }
 
     setErrors(newErrors);
@@ -85,7 +96,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -93,18 +104,25 @@ const ProductForm = ({ product, onSave, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       const productData = {
-        ...formData,
+        productBaseId: formData.productBaseId,
+        name: formData.name,
+        description: formData.description,
         price: parseFloat(formData.price),
-        quantity: parseInt(formData.quantity)
+        quantity: parseFloat(formData.quantity),
+        unit: formData.unit,
+        imageUrl: formData.imageUrl || undefined,
+        isAvailable: formData.isAvailable,
       };
+
+      // Remover campos undefined
+      Object.keys(productData).forEach(
+        (key) => productData[key] === undefined && delete productData[key]
+      );
 
       onSave(productData);
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error("Error saving product:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -116,34 +134,12 @@ const ProductForm = ({ product, onSave, onClose }) => {
     }
   };
 
-  const categories = [
-    { value: 'vegetales', label: 'Vegetales' },
-    { value: 'frutas', label: 'Frutas' },
-    { value: 'proteinas', label: 'Proteínas' },
-    { value: 'lacteos', label: 'Lácteos' },
-    { value: 'granos', label: 'Granos' },
-    { value: 'hierbas', label: 'Hierbas' },
-    { value: 'otros', label: 'Otros' }
-  ];
-
-  const units = [
-    { value: 'kg', label: 'Kilogramo (kg)' },
-    { value: 'g', label: 'Gramo (g)' },
-    { value: 'unidad', label: 'Unidad' },
-    { value: 'docena', label: 'Docena' },
-    { value: 'libra', label: 'Libra' },
-    { value: 'litro', label: 'Litro' },
-    { value: 'ml', label: 'Mililitro (ml)' },
-    { value: 'frasco', label: 'Frasco' },
-    { value: 'bolsa', label: 'Bolsa' }
-  ];
-
   return (
     <div className="product-form-overlay" onClick={handleClose}>
       <div className="product-form" onClick={(e) => e.stopPropagation()}>
         <div className="product-form__header">
           <h2 className="product-form__title">
-            {product ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+            {product ? "Editar Producto" : "Agregar Nuevo Producto"}
           </h2>
           <button
             className="product-form__close-btn"
@@ -156,16 +152,56 @@ const ProductForm = ({ product, onSave, onClose }) => {
 
         <div className="product-form__content">
           <p className="product-form__description">
-            {product 
-              ? 'Modifica la información de tu producto'
-              : 'Completa el formulario para poner a la venta un nuevo producto de tu cosecha.'
-            }
+            {product
+              ? "Modifica la información de tu producto"
+              : "Completa el formulario para poner a la venta un nuevo producto de tu cosecha."}
           </p>
 
           <form onSubmit={handleSubmit} className="product-form__form">
+            {/* CAMPO ACTUALIZADO: ProductBase selector */}
+            <div className="product-form__field">
+              <label htmlFor="productBaseId" className="product-form__label">
+                Tipo de Producto *
+              </label>
+              <select
+                id="productBaseId"
+                name="productBaseId"
+                value={formData.productBaseId}
+                onChange={handleInputChange}
+                className={`product-form__select ${
+                  errors.productBaseId ? "product-form__select--error" : ""
+                }`}
+                disabled={isSubmitting || loadingBases}
+              >
+                <option value="">
+                  {loadingBases
+                    ? "Cargando productos..."
+                    : "Selecciona un producto"}
+                </option>
+                {productBases?.map((base) => (
+                  <option key={base.id} value={base.id}>
+                    {base.name} - {base.category}
+                  </option>
+                ))}
+              </select>
+              {errors.productBaseId && (
+                <span className="product-form__error">
+                  {errors.productBaseId}
+                </span>
+              )}
+              {errorBases && (
+                <span className="product-form__error">
+                  Error al cargar productos base
+                </span>
+              )}
+              <small className="product-form__hint">
+                Selecciona el tipo de producto que vas a ofrecer
+              </small>
+            </div>
+
             <div className="product-form__field">
               <label htmlFor="name" className="product-form__label">
-                Nombre del Producto *
+                Nombre de tu oferta *
               </label>
               <input
                 type="text"
@@ -173,33 +209,18 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`product-form__input ${errors.name ? 'product-form__input--error' : ''}`}
-                placeholder="Ej: Tomates orgánicos"
+                className={`product-form__input ${
+                  errors.name ? "product-form__input--error" : ""
+                }`}
+                placeholder="Ej: Tomate Orgánico Chonto - Finca La Esperanza"
                 disabled={isSubmitting}
               />
               {errors.name && (
                 <span className="product-form__error">{errors.name}</span>
               )}
-            </div>
-
-            <div className="product-form__field">
-              <label htmlFor="category" className="product-form__label">
-                Categoría *
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                className="product-form__select"
-                disabled={isSubmitting}
-              >
-                {categories.map(category => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
+              <small className="product-form__hint">
+                Dale un nombre único a tu oferta para diferenciarte
+              </small>
             </div>
 
             <div className="product-form__field">
@@ -211,13 +232,17 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                className={`product-form__textarea ${errors.description ? 'product-form__textarea--error' : ''}`}
+                className={`product-form__textarea ${
+                  errors.description ? "product-form__textarea--error" : ""
+                }`}
                 placeholder="Ej: Tomates frescos, cultivados sin pesticidas. Perfectos para ensaladas."
                 rows={4}
                 disabled={isSubmitting}
               />
               {errors.description && (
-                <span className="product-form__error">{errors.description}</span>
+                <span className="product-form__error">
+                  {errors.description}
+                </span>
               )}
             </div>
 
@@ -231,7 +256,9 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="imageUrl"
                 value={formData.imageUrl}
                 onChange={handleInputChange}
-                className={`product-form__input ${errors.imageUrl ? 'product-form__input--error' : ''}`}
+                className={`product-form__input ${
+                  errors.imageUrl ? "product-form__input--error" : ""
+                }`}
                 placeholder="https://ejemplo.com/imagen.jpg"
                 disabled={isSubmitting}
               />
@@ -253,8 +280,10 @@ const ProductForm = ({ product, onSave, onClose }) => {
                     name="price"
                     value={formData.price}
                     onChange={handleInputChange}
-                    className={`product-form__input ${errors.price ? 'product-form__input--error' : ''}`}
-                    placeholder="2500"
+                    className={`product-form__input ${
+                      errors.price ? "product-form__input--error" : ""
+                    }`}
+                    placeholder="5000"
                     min="0"
                     step="100"
                     disabled={isSubmitting}
@@ -268,7 +297,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
 
               <div className="product-form__field product-form__field--half">
                 <label htmlFor="quantity" className="product-form__label">
-                  Cantidad disponible *
+                  Cantidad a ofertar *
                 </label>
                 <input
                   type="number"
@@ -276,7 +305,9 @@ const ProductForm = ({ product, onSave, onClose }) => {
                   name="quantity"
                   value={formData.quantity}
                   onChange={handleInputChange}
-                  className={`product-form__input ${errors.quantity ? 'product-form__input--error' : ''}`}
+                  className={`product-form__input ${
+                    errors.quantity ? "product-form__input--error" : ""
+                  }`}
                   placeholder="50"
                   min="1"
                   disabled={isSubmitting}
@@ -299,12 +330,25 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 className="product-form__select"
                 disabled={isSubmitting}
               >
-                {units.map(unit => (
+                {UNITS.map((unit) => (
                   <option key={unit.value} value={unit.value}>
                     {unit.label}
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="product-form__field">
+              <label className="product-form__checkbox-label">
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={formData.isAvailable}
+                  onChange={handleInputChange}
+                  disabled={isSubmitting}
+                />
+                <span>Producto disponible para la venta</span>
+              </label>
             </div>
 
             <div className="product-form__actions">
@@ -319,7 +363,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
               <button
                 type="submit"
                 className="product-form__save-btn"
-                disabled={isSubmitting}
+                disabled={isSubmitting || loadingBases}
               >
                 {isSubmitting ? (
                   <>
@@ -327,7 +371,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
                     Guardando...
                   </>
                 ) : (
-                  'Guardar Producto'
+                  "Guardar Producto"
                 )}
               </button>
             </div>
