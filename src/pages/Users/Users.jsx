@@ -81,9 +81,6 @@ const UsersPage = () => {
                     <h1>Gestión de Usuarios</h1>
                     <p>Administra, activa y desactiva las cuentas de la plataforma.</p>
                 </div>
-                <button className="btn-add">
-                    <span className="icon-plus">+</span> Añadir Nuevo Usuario
-                </button>
             </div>
 
             <div className="main-card">
