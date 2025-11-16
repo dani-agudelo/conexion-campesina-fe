@@ -4,7 +4,8 @@ export const PUBLIC_ROUTES = ['/login', '/register']
 
 export const MAIN_ROUTES = {
     [UserRole.PRODUCER]: '/product-management',
-    [UserRole.CLIENT]: '/catalog'
+    [UserRole.CLIENT]: '/catalog',
+    [UserRole.ADMIN]: '/users'
 }
 
 export const ROLE_ACCESS = {

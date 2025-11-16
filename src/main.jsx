@@ -15,6 +15,7 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { MainLayout } from "./layouts/MainLayout";
 import { UserRole } from "./types/enums";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { UsersPage } from "./pages/Users/Users";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: '/users',
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
+            <UsersPage />
+          </ProtectedRoute>
+        )
+      }
     ]
   },
   { path: "/", element: <Navigate to="/login" replace /> },
