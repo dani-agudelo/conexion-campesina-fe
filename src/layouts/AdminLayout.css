@@ -1,0 +1,25 @@
+.admin-layout {
+  display: flex;
+  height: calc(100vh - 60px);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.admin-layout__content {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-layout__content {
+    padding: 0;
+  }
+}
+

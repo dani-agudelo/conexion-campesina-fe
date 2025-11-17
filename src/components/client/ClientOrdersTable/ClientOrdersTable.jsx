@@ -4,7 +4,7 @@ import { useClientOrdersQuery } from "../../../hooks/query/useClientOrders";
 import { Spinner } from "../../ui/spinner/Spinner";
 import { EyeIcon, TruckIcon, XIcon } from "../../icons";
 
-const ordersPerPage = 7;
+const ordersPerPage = 6;
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("es-CO", {
