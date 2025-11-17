@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../state/auth';
 import { useUserQuery } from '../hooks/query/useUserQuery';
-import { Navbar } from '../components/ui/navbar/Navbar';
 import { Spinner } from '../components/ui/spinner/Spinner';
 import {
     Navigate,
@@ -18,7 +17,6 @@ const MainLayout = () => {
 
     return (
         <>
-            <Navbar />
             <Outlet />
         </>
     );

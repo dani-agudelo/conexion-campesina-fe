@@ -8,7 +8,13 @@ export const MAIN_ROUTES = {
     [UserRole.ADMIN]: '/users'
 }
 
-export const ROLE_ACCESS = {
-    [UserRole.PRODUCER]: [{ path: '/product-management', label: '' }],
-    [UserRole.CLIENT]: [{ path: '/catalog', label: 'Catálogo' }]
-}
+export const SIDEBAR_LINKS = {
+    [UserRole.PRODUCER]: [
+        { id: 'products', label: 'Mis Productos', path: '/product-management/products' },
+        { id: 'orders', label: 'Mis pedidos', path: '/product-management/orders' },
+    ],
+    [UserRole.CLIENT]: [
+        { id: 'catalog', label: 'Catálogo', path: '/catalog' },
+        { id: 'orders', label: 'Mis pedidos', path: '/client-orders' },
+    ],
+};

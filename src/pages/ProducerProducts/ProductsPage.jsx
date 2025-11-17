@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ProductList from "../../components/producer/ProductList";
 import ProductForm from "../../components/producer/ProductForm";
 import "./ProducerProducts.css";
@@ -9,15 +9,13 @@ import {
   useDeleteProductMutation,
 } from "../../hooks/query/useProductProducer";
 import { showSuccessAlert, showConfirmDialog} from "../../utils/sweetAlert";
-import OrdersTable from "../../components/producer/OrdersTable";
 
-const ProducerProducts = () => {
+const ProductsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeSection, setActiveSection] = useState("products");
 
   const { isPending, error, data } = useProductProducerQuery();
   const createProductMutation = useCreateProductMutation();
@@ -53,15 +51,12 @@ const ProducerProducts = () => {
   const handleSaveProduct = async (productData) => {
     try {
       if (editingProduct) {
-        // Editar producto existente
-        console.log("Updating product:", productData, productData.id, editingProduct.id);
         await updateProductMutation.mutateAsync({
           productId: editingProduct.id,
           productData: productData
         });
         showSuccessAlert("Producto actualizado exitosamente");
       } else {
-        // Crear nuevo producto
         await createProductMutation.mutateAsync(productData);
         showSuccessAlert("Producto creado exitosamente");
       }
@@ -70,7 +65,6 @@ const ProducerProducts = () => {
       setEditingProduct(null);
     } catch (error) {
       console.error("Error al guardar producto:", error);
-      // Aquí podrías mostrar un toast o mensaje de error al usuario
     }
   };
 
@@ -105,7 +99,6 @@ const ProducerProducts = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Paginación simple
   const productsPerPage = 4;
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
@@ -123,19 +116,7 @@ const ProducerProducts = () => {
     "otros",
   ];
 
-  useEffect(() => {
-    if (activeSection !== "products") {
-      setShowForm(false);
-      setEditingProduct(null);
-    }
-  }, [activeSection]);
-
-  const menuItems = [
-    { id: "products", label: "Mis Productos" },
-    { id: "orders", label: "Mis pedidos" },
-  ];
-
-  const renderProductsSection = () => (
+  return (
     <div className="producer-products">
       <div className="producer-products__header">
         <h1 className="producer-products__title">Mis Productos</h1>
@@ -244,32 +225,7 @@ const ProducerProducts = () => {
       )}
     </div>
   );
-
-  return (
-    <div className="producer-dashboard">
-      <aside className="producer-dashboard__sidebar">
-        <nav className="producer-dashboard__nav">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`producer-dashboard__nav-link ${
-                activeSection === item.id
-                  ? "producer-dashboard__nav-link--active"
-                  : ""
-              }`}
-              onClick={() => setActiveSection(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
-      <main className="producer-dashboard__content">
-        {activeSection === "products" ? renderProductsSection() : <OrdersTable />}
-      </main>
-    </div>
-  );
 };
 
-export default ProducerProducts;
+export default ProductsPage;
+

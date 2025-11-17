@@ -9,13 +9,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
-import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { MainLayout } from "./layouts/MainLayout";
+import { ClientLayout } from "./layouts/ClientLayout";
+import { ProducerLayout } from "./layouts/ProducerLayout";
 import { UserRole } from "./types/enums";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UsersPage } from "./pages/Users/Users";
+import ProductsPage from "./pages/ProducerProducts/ProductsPage";
+import OrdersPage from "./pages/ProducerProducts/OrdersPage";
+import ClientOrdersTable from "./components/client/ClientOrdersTable";
 
 const queryClient = new QueryClient();
 
@@ -31,13 +35,43 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
-        path: "/product-management",
+        path: '/users',
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
+            <UsersPage />
+          </ProtectedRoute>
+        )
+      }
+    ]
+  },
+  {
+    element: <ProducerLayout />,
+    children: [
+      {
+        path: "/product-management/products",
         element: (
           <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
-            <ProducerProducts />
+            <ProductsPage />
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/product-management/orders",
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+            <OrdersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/product-management",
+        element: <Navigate to="/product-management/products" replace />,
+      },
+    ]
+  },
+  {
+    element: <ClientLayout />,
+    children: [
       {
         path: "/catalog",
         element: (
@@ -47,13 +81,13 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/users',
+        path: "/client-orders",
         element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
-            <UsersPage />
+          <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+            <ClientOrdersTable />
           </ProtectedRoute>
-        )
-      }
+        ),
+      },
     ]
   },
   { path: "/", element: <Navigate to="/login" replace /> },
