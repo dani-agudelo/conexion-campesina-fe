@@ -8,6 +8,6 @@ export const MAIN_ROUTES = {
 }
 
 export const ROLE_ACCESS = {
-    [UserRole.PRODUCER]: [{ path: '/product-management', label: 'Gestionar productos' }],
+    [UserRole.PRODUCER]: [{ path: '/product-management', label: '' }],
     [UserRole.CLIENT]: [{ path: '/catalog', label: 'Catálogo' }]
 }
