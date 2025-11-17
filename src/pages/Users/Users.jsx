@@ -1,6 +1,6 @@
 import './Users.css';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { changeUserStatus } from '../../services/users';
 import { UserStatus } from '../../constants/user';
 import { Spinner } from '../../components/ui/spinner/Spinner'
@@ -53,6 +53,8 @@ const UsersPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState('Todos');
     const [statusFilter, setStatusFilter] = useState('Todos');
+    const [currentPage, setCurrentPage] = useState(1);
+    const usersPerPage = 10;
 
     const filteredUsers = useMemo(() => {
         return users.filter(user => {
@@ -71,6 +73,32 @@ const UsersPage = () => {
             return matchesSearch && matchesRole && matchesStatus;
         });
     }, [users, searchTerm, roleFilter, statusFilter]);
+
+    const totalPages = useMemo(
+        () => Math.ceil(filteredUsers.length / usersPerPage),
+        [filteredUsers.length]
+    );
+
+    useEffect(() => {
+        if (totalPages === 0) {
+            setCurrentPage(1);
+            return;
+        }
+
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, roleFilter, statusFilter]);
+
+    const startIndex = (currentPage - 1) * usersPerPage;
+    const paginatedUsers = filteredUsers.slice(startIndex, startIndex + usersPerPage);
+
+    const showingFrom = filteredUsers.length === 0 ? 0 : startIndex + 1;
+    const showingTo = startIndex + paginatedUsers.length;
 
     if (isLoading) return <Spinner />
 
@@ -175,8 +203,8 @@ const UsersPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredUsers.length > 0 ? (
-                                filteredUsers.map(user => (
+                            {paginatedUsers.length > 0 ? (
+                                paginatedUsers.map(user => (
                                     <tr key={user.id}>
                                         <td className="font-bold">{user.fullName}</td>
                                         <td className="text-gray">{user.email}</td>
@@ -249,13 +277,41 @@ const UsersPage = () => {
                 </div>
 
                 <div className="table-footer">
-                    <span className="footer-text">
-                        Mostrando {filteredUsers.length} de {users.length} usuarios
-                    </span>
-                    <div className="pagination-buttons">
-                        <button className="btn-page">Anterior</button>
-                        <button className="btn-page">Siguiente</button>
+                    <div className="footer-text">
+                        Mostrando {showingFrom}-{showingTo} de {filteredUsers.length}
                     </div>
+                    {totalPages > 1 && (
+                        <div className="pagination-buttons">
+                            <button
+                                className="btn-page"
+                                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                                disabled={currentPage === 1}
+                            >
+                                Anterior
+                            </button>
+                            {Array.from({ length: totalPages }, (_, pageIndex) => {
+                                const page = pageIndex + 1;
+                                return (
+                                    <button
+                                        key={page}
+                                        className={`btn-page ${page === currentPage ? 'btn-page--active' : ''}`}
+                                        onClick={() => setCurrentPage(page)}
+                                    >
+                                        {page}
+                                    </button>
+                                );
+                            })}
+                            <button
+                                className="btn-page"
+                                onClick={() =>
+                                    setCurrentPage((page) => Math.min(totalPages, page + 1))
+                                }
+                                disabled={currentPage === totalPages}
+                            >
+                                Siguiente
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

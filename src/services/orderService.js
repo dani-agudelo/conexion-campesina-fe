@@ -7,3 +7,11 @@ export const createOrder = async (orderData) => {
   });
 };
 
+export const getProducerOrders = async () => {
+  return await fetcher('orders/producer/me');
+};
+
+export const getClientOrders = async () => {
+  return await fetcher('orders/client/me');
+};
+

@@ -31,14 +31,11 @@ const CatalogProducts = () => {
     staleTime: 1000 * 60 * 5,
   })
 
-  console.log('Productos obtenidos:', products)
-
-  // 🧠 Ordenamiento local (solo en cliente)
   const sortedProducts = [...products].sort((a, b) => {
     if (sort === 'PrecioAsc') return a.price - b.price
     if (sort === 'PrecioDesc') return b.price - a.price
     if (sort === 'NombreAZ') return a.name.localeCompare(b.name)
-    return 0 // Relevancia = sin orden
+    return 0
   })
 
   if (isLoading) {
