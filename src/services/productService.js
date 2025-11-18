@@ -5,7 +5,6 @@ import { fetcher } from "../lib/http";
  * Maneja las llamadas al backend para CRUD de productos
  */
 
-// Exportaciones individuales para usar con React Query
 export const getProductsProducer = async () => {
   return await fetcher("product/offer/get/producer");
 };
@@ -28,3 +27,7 @@ export const deleteProduct = async (productId) => {
 export const getProductsBase = async () => {
   return await fetcher("product/base");
 };
+
+export const getProductById = async (productId) => {
+  return await fetcher(`product/offer/${productId}`);
+}

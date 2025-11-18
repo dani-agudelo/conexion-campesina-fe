@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProductsProducer, createProduct, updateProduct, deleteProduct } from "../../services/productService";
+import { getProductsProducer, createProduct, updateProduct, deleteProduct, getProductById } from "../../services/productService";
 import { showErrorAlert } from "../../utils/sweetAlert";
 
 export const useProductProducerQuery = () => {
@@ -55,3 +55,13 @@ export const useDeleteProductMutation = () => {
     },
   });
 };
+
+
+export const useProductByIdQuery = (productId) => {
+  return useQuery({
+    queryKey: ["productById", productId],
+    queryFn: () => getProductById(productId),
+    enabled: !!productId,
+    staleTime: 1000 * 60 * 5,
+  });
+}

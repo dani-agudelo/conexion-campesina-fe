@@ -5,9 +5,10 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
+import ProductDetail from "./pages/ProductDetail";
 import RegisterPage from "./pages/Register";
 import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts";
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
-    ]
+    ],
   },
   {
     element: <MainLayout />,
@@ -45,10 +46,17 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-    ]
+      {
+        path: "/product/:productId",
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+            <ProductDetail />
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
   { path: "/", element: <Navigate to="/login" replace /> },
-
 
   // {
   //   path: '*',
