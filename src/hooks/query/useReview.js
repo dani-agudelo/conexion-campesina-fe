@@ -1,8 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getReviewProduct,
-  getSumaryReview, createReview
-, updateReview, deleteReview
+  getSumaryReview,
+  createReview,
+  updateReview,
+  deleteReview,
+  hasReviewed,
 } from "../../services/reviewService";
 import { showErrorAlert } from "../../utils/sweetAlert";
 
@@ -30,13 +33,24 @@ export const useReviewSummary = (productOfferId) => {
   });
 };
 
+export const useHasReviewed = (productOfferId) => {
+  return useQuery({
+    queryKey: ["hasReviewed", productOfferId],
+    queryFn: () => hasReviewed(productOfferId),
+    enabled: !!productOfferId,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
 export const useCreateReviewMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (reviewData) => createReview(reviewData),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["reviews"]);
-      queryClient.invalidateQueries(["reviewSummary"]);
+    onSuccess: (data, variables) => {
+      // Invalidar queries específicas del producto
+      queryClient.invalidateQueries(["reviews", variables.productOfferId]);
+      queryClient.invalidateQueries(["reviewSummary", variables.productOfferId]);
+      queryClient.invalidateQueries(["hasReviewed", variables.productOfferId]);
     },
     onError: (error) => {
       console.error("Error al crear la reseña:", error);
@@ -51,8 +65,9 @@ export const useUpdateReviewMutation = () => {
     mutationFn: ({ reviewData, reviewId }) =>
       updateReview(reviewData, reviewId),
     onSuccess: () => {
-      queryClient.invalidateQueries(["reviews"]);
-      queryClient.invalidateQueries(["reviewSummary"]);
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["reviewSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["hasReviewed"] });
     },
     onError: (error) => {
       console.error("Error al actualizar la reseña:", error);
@@ -66,8 +81,10 @@ export const useDeleteReviewMutation = () => {
   return useMutation({
     mutationFn: (reviewId) => deleteReview(reviewId),
     onSuccess: () => {
-      queryClient.invalidateQueries(["reviews"]);
-      queryClient.invalidateQueries(["reviewSummary"]);
+      // Invalidar todas las queries de reviews para refrescar la UI
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["reviewSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["hasReviewed"] });
     },
     onError: (error) => {
       console.error("Error al eliminar la reseña:", error);

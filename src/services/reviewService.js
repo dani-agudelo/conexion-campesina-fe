@@ -13,23 +13,26 @@ export const getSumaryReview = async (productOfferId) => {
   return await fetcher(`review/summary/${productOfferId}`);
 };
 
-
-export const createReview = async (reviewData) =>{
+export const createReview = async (reviewData) => {
   return await fetcher("review", {
     method: "POST",
-    body: reviewData
+    body: reviewData,
   });
-}
+};
 
 export const updateReview = async (reviewData, reviewId) => {
   return await fetcher(`review/${reviewId}`, {
     method: "PATCH",
-    body: reviewData
+    body: reviewData,
   });
-}
+};
 
 export const deleteReview = async (reviewId) => {
   return await fetcher(`review/client/${reviewId}`, {
-    method: "DELETE"
+    method: "DELETE",
   });
-}
+};
+
+export const hasReviewed = async (productOfferId) => {
+  return await fetcher(`review/has-reviewed/${productOfferId}`);
+};
