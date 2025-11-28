@@ -1,19 +1,40 @@
+.producer-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+
+.producer-dashboard__content {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  padding: 40px 32px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
 .producer-products {
-  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
-  background-color: white;
-  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .producer-products__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 0;
   background: white;
   padding: 20px;
   border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .producer-products__title {
@@ -149,7 +170,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 30px;
+  margin: 30px 0;
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -216,6 +237,15 @@
   .producer-products__pagination {
     flex-wrap: wrap;
   }
+
+  .producer-dashboard__sidebar {
+    width: 220px;
+    padding: 24px 18px;
+  }
+
+  .producer-dashboard__content {
+    padding: 32px 24px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -231,4 +261,57 @@
   .producer-products__filters {
     padding: 15px;
   }
+
+  .producer-dashboard {
+    flex-direction: column;
+  }
+
+  .producer-dashboard__sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    box-shadow: none;
+  }
+
+  .producer-dashboard__content {
+    padding: 24px 16px;
+  }
+}
+
+.producer-products__error {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  padding: 40px 20px;
+}
+
+.producer-products__error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.producer-products__error-icon {
+  font-size: 3rem;
+}
+
+.producer-products__error-content h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.producer-products__error-content p {
+  margin: 0;
+  font-size: 1rem;
+  color: #6c757d;
+  max-width: 500px;
 }

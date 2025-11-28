@@ -1,0 +1,24 @@
+.client-layout {
+  display: flex;
+  height: calc(100vh - 60px);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.client-layout__content {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .client-layout__content {
+    padding: 24px 16px;
+  }
+}
+

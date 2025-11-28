@@ -1,11 +1,8 @@
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../state/auth';
 import { useUserQuery } from '../hooks/query/useUserQuery';
-import { Navbar } from '../components/ui/navbar/Navbar';
 import { Spinner } from '../components/ui/spinner/Spinner';
-import {
-    Navigate,
-} from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const MainLayout = () => {
     const setCurrentUser = useAuth(state => state.setCurrentUser);
@@ -16,12 +13,7 @@ const MainLayout = () => {
 
     setCurrentUser(data.user);
 
-    return (
-        <>
-            <Navbar />
-            <Outlet />
-        </>
-    );
+    return <Outlet />;
 }
 
 export { MainLayout };

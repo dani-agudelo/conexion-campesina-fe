@@ -1,0 +1,25 @@
+.producer-layout {
+  display: flex;
+  height: calc(100vh - 60px);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.producer-layout__content {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .producer-layout__content {
+    padding: 24px 16px;
+  }
+}
+

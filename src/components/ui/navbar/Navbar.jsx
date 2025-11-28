@@ -1,8 +1,7 @@
 import "./Navbar.css";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../../state/auth";
-import { ROLE_ACCESS } from "../../../constants/pages/pages";
 import { useToken } from "../../../state/token";
 import { useCart } from "../../../state/cart";
 import { CartModal } from "../../cart";
@@ -17,7 +16,6 @@ const Navbar = () => {
     const navigate = useNavigate();
     const clearToken = useToken(state => state.clearToken);
     const totalItems = useCart((state) => state.items.length);
-
 
     const handleSignOut = () => {
         clearToken();
@@ -37,28 +35,13 @@ const Navbar = () => {
 
     if (!currentUser) return null; // seguridad extra
 
-    const links = ROLE_ACCESS[currentUser.role] || [];
-
     return (
         <header className="navbar">
             <section className="navbar__left">
                 <div className="navbar__logo">
-                    <span className="logo-bold">Conexión Campesina</span>
+                    <span className="navbar__logo-title">Conexión</span>
+                    <span className="navbar__logo-subtitle">Campesina</span>
                 </div>
-
-                <nav className="navbar__links">
-                    {links.map((link) => (
-                        <NavLink
-                            key={link.path}
-                            to={link.path}
-                            className={({ isActive }) =>
-                                `nav-link ${isActive ? "active" : ""}`
-                            }
-                        >
-                            {link.label}
-                        </NavLink>
-                    ))}
-                </nav>
             </section>
 
             <div className="navbar__actions">
