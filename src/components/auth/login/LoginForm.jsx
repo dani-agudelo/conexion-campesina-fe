@@ -5,7 +5,7 @@ const LoginForm = ({ onSubmit }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isSubmitting }
   } = useForm();
 
   const onFormSubmit = (data) => {
@@ -71,7 +71,7 @@ const LoginForm = ({ onSubmit }) => {
           <a className="link" href="#">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <button className="primary-button" type="submit">Iniciar Sesión</button>
+        <button id='submit-login-btn' className="primary-button" type="submit" disabled={isSubmitting}>Iniciar Sesión</button>
       </form>
 
       <p className="register-text">
