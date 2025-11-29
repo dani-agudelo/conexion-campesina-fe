@@ -18,9 +18,11 @@ import { ProducerLayout } from "./layouts/ProducerLayout";
 import { UserRole } from "./types/enums";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UsersPage } from "./pages/Users/Users";
+import { ProfilePage } from './pages/Profile/Profile';
 import ProductsPage from "./pages/ProducerProducts/ProductsPage";
 import OrdersPage from "./pages/ProducerProducts/OrdersPage";
 import ClientOrdersTable from "./components/client/ClientOrdersTable";
+import { Navbar } from "./components/ui/navbar/Navbar";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,17 @@ const router = createBrowserRouter([
             )
           }
         ]
+      },
+      {
+        path: '/profile',
+        element: (
+          <>
+            <Navbar />
+            <ProtectedRoute allowedRoles={[UserRole.CLIENT, UserRole.PRODUCER]}>
+              <ProfilePage />
+            </ProtectedRoute>
+          </>
+        )
       },
       {
         element: <ProducerLayout />,
@@ -96,13 +109,7 @@ const router = createBrowserRouter([
       },
     ]
   },
-  { path: "/", element: <Navigate to="/login" replace /> },
-
-
-  // {
-  //   path: '*',
-  //   element: <NotFoundPage />,
-  // },
+  { path: "/", element: <Navigate to="/login" replace /> }
 ]);
 
 createRoot(document.getElementById("root")).render(

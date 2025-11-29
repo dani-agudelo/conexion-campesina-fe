@@ -1,11 +1,12 @@
 import "./Navbar.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../../state/auth";
 import { useToken } from "../../../state/token";
 import { useCart } from "../../../state/cart";
 import { CartModal } from "../../cart";
 import { UserRole } from "../../../types/enums";
+import { MAIN_ROUTES } from "../../../constants/pages/pages";
 
 const Navbar = () => {
     const clearUser = useAuth((state) => state.clearUser);
@@ -38,10 +39,10 @@ const Navbar = () => {
     return (
         <header className="navbar">
             <section className="navbar__left">
-                <div className="navbar__logo">
+                <NavLink className="navbar__logo" to={MAIN_ROUTES[currentUser.role]}>
                     <span className="navbar__logo-title">Conexión</span>
                     <span className="navbar__logo-subtitle">Campesina</span>
-                </div>
+                </NavLink>
             </section>
 
             <div className="navbar__actions">
@@ -73,7 +74,12 @@ const Navbar = () => {
                                 <p className="profile-role">{currentUser.role}</p>
                             </div>
                             <hr className="dropdown-divider" />
-                            <button className="dropdown-btn">Ver perfil</button>
+                            <NavLink
+                                to='profile'
+                                className="dropdown-btn dropdown-link"
+                            >
+                                Ver perfil
+                            </NavLink>
                             <button
                                 className="dropdown-btn logout"
                                 onClick={handleSignOut}

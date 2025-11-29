@@ -21,6 +21,7 @@
   flex-direction: column;
   line-height: 1.1;
   color: #24324a;
+  text-decoration: none;
 }
 
 .navbar__logo-title {
@@ -180,7 +181,9 @@
 }
 
 .dropdown-btn {
+  display: block;
   width: 100%;
+  box-sizing: border-box; 
   text-align: left;
   background: none;
   border: none;
@@ -189,6 +192,7 @@
   cursor: pointer;
   color: #333;
   transition: background 0.2s;
+  text-decoration: none;
 }
 
 .dropdown-btn:hover {
