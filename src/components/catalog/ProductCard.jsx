@@ -79,7 +79,7 @@ const ProductCard = ({ product }) => {
                 </span>
 
                 {isLoading ? (
-                    <p className="loader">Cargando productor...</p>
+                    <p >Cargando productor...</p>
                 ) : (
                     producer && (
                         <p className="producer">

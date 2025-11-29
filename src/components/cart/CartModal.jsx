@@ -45,12 +45,10 @@ const CartModal = ({ isOpen, onClose }) => {
 
     try {
       const orderData = {
-        status: 'PENDING',
         address: address.trim(),
         orderDetails: items.map((item) => ({
           productOfferId: item.productOfferId,
           quantity: item.quantity,
-          price: item.price,
         })),
       };
 
