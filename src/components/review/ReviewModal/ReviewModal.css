@@ -1,0 +1,163 @@
+/* Botón para abrir el modal */
+.leave-review-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.leave-review-btn:hover:not(:disabled) {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.leave-review-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos del modal */
+.review-modal-popup {
+  border-radius: 16px !important;
+  padding: 0 !important;
+  max-width: 500px !important;
+}
+
+.review-modal-title {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+  padding: 24px 24px 16px !important;
+  margin: 0 !important;
+}
+
+.review-modal-content {
+  padding: 0 24px 24px;
+  text-align: left;
+}
+
+.review-subtitle {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 24px 0;
+}
+
+/* Sección de calificación */
+.rating-section {
+  margin-bottom: 24px;
+}
+
+.rating-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.stars-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.star-btn {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-btn:hover {
+  transform: scale(1.2);
+}
+
+.star-btn svg {
+  transition: all 0.2s ease;
+}
+
+/* Sección de opinión */
+.opinion-section {
+  margin-bottom: 16px;
+}
+
+.opinion-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.review-textarea::placeholder {
+  color: #999;
+}
+
+/* Botones del modal */
+.review-confirm-btn {
+  background-color: #4caf50 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 32px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.review-confirm-btn:hover {
+  background-color: #45a049 !important;
+  transform: translateY(-1px) !important;
+}
+
+.review-cancel-btn {
+  background-color: #f5f5f5 !important;
+  color: #666 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 32px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.review-cancel-btn:hover {
+  background-color: #e0e0e0 !important;
+}
+
+/* Validación */
+.swal2-validation-message {
+  background-color: #fee !important;
+  color: #c33 !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  margin-top: 12px !important;
+}

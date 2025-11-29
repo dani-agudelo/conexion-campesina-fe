@@ -27,3 +27,7 @@ export const deleteProduct = async (productId) => {
 export const getProductsBase = async () => {
   return await fetcher("product/base");
 };
+
+export const getProductById = async (productId) => {
+  return await fetcher(`product/offer/${productId}`);
+}

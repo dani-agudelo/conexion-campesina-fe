@@ -1,8 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import "./ClientOrdersTable.css";
 import { useClientOrdersQuery } from "../../../hooks/query/useClientOrders";
 import { Spinner } from "../../ui/spinner/Spinner";
-import { EyeIcon, TruckIcon, XIcon } from "../../icons";
+import {
+  EyeIcon,
+  TruckIcon,
+  XIcon,
+  DownloadIcon,
+  FilePlusIcon,
+} from "../../icons";
+import {
+  useShippingByOrder,
+  useCreateShippingMutation,
+} from "../../../hooks/query/useShipping";
+import { showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
+import { getDocumentShipping } from "../../../services/shippingService";
 
 const ordersPerPage = 6;
 
@@ -49,6 +61,8 @@ const getStatusClass = (status) => {
 const ClientOrdersTable = () => {
   const { data: orders = [], isPending, isError } = useClientOrdersQuery();
   const [currentPage, setCurrentPage] = useState(1);
+  const [shippingLoading, setShippingLoading] = useState({});
+  const shippingDocsRef = useRef({});
 
   const totalPages = useMemo(
     () => Math.ceil(orders.length / ordersPerPage),
@@ -69,6 +83,16 @@ const ClientOrdersTable = () => {
   const startIndex = (currentPage - 1) * ordersPerPage;
   const paginatedOrders = orders.slice(startIndex, startIndex + ordersPerPage);
 
+  // CORRECCIÓN: Llamar a los hooks FUERA del map, para todas las órdenes paginadas
+  const shippingQueries = [
+    useShippingByOrder(paginatedOrders[0]?.id),
+    useShippingByOrder(paginatedOrders[1]?.id),
+    useShippingByOrder(paginatedOrders[2]?.id),
+    useShippingByOrder(paginatedOrders[3]?.id),
+    useShippingByOrder(paginatedOrders[4]?.id),
+    useShippingByOrder(paginatedOrders[5]?.id),
+  ];
+
   const showingFrom = orders.length === 0 ? 0 : startIndex + 1;
   const showingTo = startIndex + paginatedOrders.length;
 
@@ -86,6 +110,27 @@ const ClientOrdersTable = () => {
     return `#CC-${(order?.id || "").slice(0, 6).toUpperCase()}`;
   };
 
+  const createShipping = useCreateShippingMutation();
+
+  const handleDownload = async (orderId) => {
+    setShippingLoading((prev) => ({ ...prev, [orderId]: "downloading" }));
+    try {
+      const { blob, filename } = await getDocumentShipping(orderId);
+      shippingDocsRef.current[orderId] = { blob, filename };
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      showSuccessAlert("Comprobante descargado correctamente");
+    } catch (error) {
+      showErrorAlert("No se pudo descargar el comprobante");
+    } finally {
+      setShippingLoading((prev) => ({ ...prev, [orderId]: null }));
+    }
+  };
+
   if (isPending) {
     return (
       <div className="client-orders__loader">
@@ -98,7 +143,10 @@ const ClientOrdersTable = () => {
     return (
       <div className="client-orders__state client-orders__state--error">
         <h2>Hubo un problema al cargar tus pedidos</h2>
-        <p>No se pudieron cargar los pedidos. Por favor, intenta de nuevo más tarde.</p>
+        <p>
+          No se pudieron cargar los pedidos. Por favor, intenta de nuevo más
+          tarde.
+        </p>
       </div>
     );
   }
@@ -135,67 +183,143 @@ const ClientOrdersTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedOrders.map((order, index) => (
-                  <tr key={order.id}>
-                    <td className="client-orders__id">
-                      {buildOrderCode(order, index)}
-                    </td>
-                    <td>{formatDate(order.orderDate || order.createdAt)}</td>
-                    <td>
-                      <span className={`client-orders__status ${getStatusClass(order.status)}`}>
-                        {getStatusLabel(order.status)}
-                      </span>
-                    </td>
-                    <td className="client-orders__total">
-                      {formatCurrency(order.totalAmount)}
-                    </td>
-                    <td>{order.totalItems ?? order.orderDetails?.length ?? "-"}</td>
-                    <td className="client-orders__address">
-                      {order.address || "-"}
-                    </td>
-                    <td>
-                      <div className="client-orders__actions">
-                        <button
-                          type="button"
-                          className="client-orders__button client-orders__button--icon"
-                          onClick={() => {
-                            console.info("Ver detalles del pedido:", order.id);
-                          }}
-                          aria-label="Ver detalles"
-                          title="Ver detalles"
+                {paginatedOrders.map((order, index) => {
+                  const { data: shipping, isLoading: loadingShipping } =
+                    shippingQueries[index];
+                  return (
+                    <tr key={order.id}>
+                      <td className="client-orders__id">
+                        {buildOrderCode(order, index)}
+                      </td>
+                      <td>{formatDate(order.orderDate || order.createdAt)}</td>
+                      <td>
+                        <span
+                          className={`client-orders__status ${getStatusClass(
+                            order.status
+                          )}`}
                         >
-                          <EyeIcon size={18} />
-                        </button>
-                        {order.status === "PENDING" && (
+                          {getStatusLabel(order.status)}
+                        </span>
+                      </td>
+                      <td className="client-orders__total">
+                        {formatCurrency(order.totalAmount)}
+                      </td>
+                      <td>
+                        {order.totalItems ?? order.orderDetails?.length ?? "-"}
+                      </td>
+                      <td className="client-orders__address">
+                        {order.address || "-"}
+                      </td>
+                      <td className="client-orders__actions-cell">
+                        <div className="client-orders__actions">
                           <button
                             type="button"
                             className="client-orders__button client-orders__button--icon"
                             onClick={() => {
-                              console.info("Cancelar pedido:", order.id);
+                              console.info(
+                                "Ver detalles del pedido:",
+                                order.id
+                              );
                             }}
-                            aria-label="Cancelar pedido"
-                            title="Cancelar pedido"
+                            aria-label="Ver detalles"
+                            title="Ver detalles"
                           >
-                            <XIcon size={18} />
+                            <EyeIcon size={18} />
                           </button>
-                        )}
-                        {order.status === "PAID" && (
-                          <button
-                            type="button"
-                            className="client-orders__button client-orders__button--secondary client-orders__button--icon"
-                            onClick={() => {
-                              console.info("Ver información de envío:", order.id);
-                            }}
-                            aria-label="Ver información de envío"
-                            title="Ver información de envío"
-                          >
-                            <TruckIcon size={18} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {order.status === "PENDING" && (
+                            <button
+                              type="button"
+                              className="client-orders__button client-orders__button--icon"
+                              onClick={() => {
+                                console.info("Cancelar pedido:", order.id);
+                              }}
+                              aria-label="Cancelar pedido"
+                              title="Cancelar pedido"
+                            >
+                              <XIcon size={18} />
+                            </button>
+                          )}
+                          {/* Botones de comprobante de envío - disponibles para pedidos PAID, DELIVERED o PENDING (prueba) */}
+                          {(order.status === "PAID" || order.status === "DELIVERED" || order.status === "PENDING") && (
+                            <>
+                              {loadingShipping ? (
+                                <button
+                                  type="button"
+                                  className="client-orders__button client-orders__button--icon"
+                                  disabled
+                                  aria-label="Cargando información de envío"
+                                  title="Cargando..."
+                                >
+                                  <Spinner size={18} />
+                                </button>
+                              ) : shipping && shipping.id ? (
+                                // SI EXISTE el comprobante - Mostrar botón de descarga
+                                <button
+                                  type="button"
+                                  className="client-orders__button client-orders__button--secondary client-orders__button--icon"
+                                  disabled={
+                                    shippingLoading[order.id] === "downloading"
+                                  }
+                                  onClick={() => handleDownload(order.id)}
+                                  aria-label="Descargar comprobante de envío"
+                                  title="Descargar comprobante de envío"
+                                >
+                                  {shippingLoading[order.id] === "downloading" ? (
+                                    <Spinner size={18} />
+                                  ) : (
+                                    <DownloadIcon size={18} />
+                                  )}
+                                </button>
+                              ) : (
+                                // NO EXISTE el comprobante - Mostrar botón de generar
+                                <button
+                                  type="button"
+                                  className="client-orders__button client-orders__button--primary client-orders__button--icon"
+                                  disabled={
+                                    createShipping.isPending ||
+                                    shippingLoading[order.id] === "generating"
+                                  }
+                                  onClick={async () => {
+                                    setShippingLoading((prev) => ({
+                                      ...prev,
+                                      [order.id]: "generating",
+                                    }));
+                                    createShipping.mutate(order.id, {
+                                      onSuccess: () => {
+                                        showSuccessAlert(
+                                          "Comprobante de envío generado correctamente"
+                                        );
+                                      },
+                                      onError: () => {
+                                        showErrorAlert(
+                                          "No se pudo generar el comprobante de envío"
+                                        );
+                                      },
+                                      onSettled: () => {
+                                        setShippingLoading((prev) => ({
+                                          ...prev,
+                                          [order.id]: null,
+                                        }));
+                                      },
+                                    });
+                                  }}
+                                  aria-label="Generar comprobante de envío"
+                                  title="Generar comprobante de envío"
+                                >
+                                  {shippingLoading[order.id] === "generating" ? (
+                                    <Spinner size={18} />
+                                  ) : (
+                                    <FilePlusIcon size={18} />
+                                  )}
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -209,7 +333,9 @@ const ClientOrdersTable = () => {
                 <button
                   type="button"
                   className="client-orders__page-button"
-                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  onClick={() =>
+                    setCurrentPage((page) => Math.max(1, page - 1))
+                  }
                   disabled={currentPage === 1}
                 >
                   Anterior
@@ -221,7 +347,9 @@ const ClientOrdersTable = () => {
                       key={page}
                       type="button"
                       className={`client-orders__page-button ${
-                        page === currentPage ? "client-orders__page-button--active" : ""
+                        page === currentPage
+                          ? "client-orders__page-button--active"
+                          : ""
                       }`}
                       onClick={() => setCurrentPage(page)}
                     >
@@ -249,4 +377,3 @@ const ClientOrdersTable = () => {
 };
 
 export default ClientOrdersTable;
-
