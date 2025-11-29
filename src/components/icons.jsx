@@ -18,4 +18,138 @@ export function AddToCartIcon({ size = 19, dy = -3, scale = 1.15, style = {}, ..
   );
 }
 
+export function EyeIcon({ size = 16, style = {}, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      {...props}
+    >
+      <path
+        d="M1.173 8C2.157 5.16 5.313 2.5 8 2.5c2.687 0 5.843 2.66 6.827 5.5C13.843 10.84 10.687 13.5 8 13.5c-2.687 0-5.843-2.66-6.827-5.5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function TruckIcon({ size = 16, style = {}, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      {...props}
+    >
+      <path
+        d="M1 4h8v6H1V4z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 4h3l2 2v4h-5V4z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function XIcon({ size = 16, style = {}, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      {...props}
+    >
+      <path
+        d="M12 4L4 12M4 4l8 8"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function DownloadIcon({ size = 16, style = {}, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      {...props}
+    >
+      <path
+        d="M8 2v8m0 0l-3-3m3 3l3-3M2 14h12"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function FilePlusIcon({ size = 16, style = {}, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      {...props}
+    >
+      <rect
+        x="3"
+        y="2"
+        width="10"
+        height="12"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M8 6v4M6 8h4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 

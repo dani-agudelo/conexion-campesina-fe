@@ -44,7 +44,7 @@ const ProductCard = ({ product }) => {
       staleTime: 1000 * 60 * 10,
     });
   };
-  const { data: producer, isLoading } = useProducer(product.producerId);
+  const { data: producer } = useProducer(product.producerId);
 
   const handleAddToCart = useCallback(
     (quantity) => {
@@ -62,7 +62,7 @@ const ProductCard = ({ product }) => {
   }, []);
 
   const handleOpenDetailsProducts = useCallback(() => {
-    navigate(`/product/${product.id}`)
+    navigate(`/product/${product.id}`);
   }, [product.id]);
 
   return (
@@ -79,22 +79,11 @@ const ProductCard = ({ product }) => {
         <h2>{product.name}</h2>
         <p>{product.description}</p>
 
-        <span className="price">
-          ${product.price}{" "}
-          <span className="unit">
-            /{unitSymbols[product.unit] ?? product.unit ?? ""}
-          </span>
-        </span>
-
-        {isLoading ? (
-          <p className="loader">Cargando productor...</p>
-        ) : (
-          producer && (
-            <p className="producer">
-              Vendido por:{" "}
-              <span className="producer-link">{producer.fullName}</span>
-            </p>
-          )
+        {producer && (
+          <p className="producer">
+            Vendido por:{" "}
+            <span className="producer-link">{producer.fullName}</span>
+          </p>
         )}
 
         <button className="add-btn" onClick={handleOpenModal}>

@@ -54,7 +54,7 @@ const ProductDetail = () => {
   // Handler para cerrar el modal y limpiar el estado
   const handleCloseEditModal = () => {
     setReviewToEdit(null);
-  };  
+  };
   return (
     <div className="page-container">
       <ProductOverview product={product} summary={summary} />

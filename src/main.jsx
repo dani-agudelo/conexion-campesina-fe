@@ -10,13 +10,18 @@ import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
 import ProductDetail from "./pages/ProductDetail";
 import RegisterPage from "./pages/Register";
-import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { MainLayout } from "./layouts/MainLayout";
+import { AdminLayout } from "./layouts/AdminLayout";
+import { ClientLayout } from "./layouts/ClientLayout";
+import { ProducerLayout } from "./layouts/ProducerLayout";
 import { UserRole } from "./types/enums";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UsersPage } from "./pages/Users/Users";
+import ProductsPage from "./pages/ProducerProducts/ProductsPage";
+import OrdersPage from "./pages/ProducerProducts/OrdersPage";
+import ClientOrdersTable from "./components/client/ClientOrdersTable";
 
 const queryClient = new QueryClient();
 
@@ -32,20 +37,42 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
-        path: "/product-management",
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
-            <ProducerProducts />
-          </ProtectedRoute>
-        ),
+        element: <AdminLayout />,
+        children: [
+          {
+            path: '/users',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
+                <UsersPage />
+              </ProtectedRoute>
+            )
+          }
+        ]
       },
       {
-        path: "/catalog",
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
-            <CatalogPage />
-          </ProtectedRoute>
-        ),
+        element: <ProducerLayout />,
+        children: [
+          {
+            path: "/product-management/products",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+                <ProductsPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/product-management/orders",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+                <OrdersPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/product-management",
+            element: <Navigate to="/product-management/products" replace />,
+          },
+        ]
       },
       {
         path: "/product/:productId",
@@ -56,13 +83,26 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/users',
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
-            <UsersPage />
-          </ProtectedRoute>
-        )
-      }
+        element: <ClientLayout />,
+        children: [
+          {
+            path: "/catalog",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+                <CatalogPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/client-orders",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+                <ClientOrdersTable />
+              </ProtectedRoute>
+            ),
+          },
+        ]
+      },
     ]
   },
   { path: "/", element: <Navigate to="/login" replace /> },
