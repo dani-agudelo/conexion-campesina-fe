@@ -118,16 +118,7 @@ const router = createBrowserRouter([
       },
     ]
   },
-<<<<<<< HEAD
-  { path: "/", element: <Navigate to="/login" replace /> },
-
-  // {
-  //   path: '*',
-  //   element: <NotFoundPage />,
-  // },
-=======
   { path: "/", element: <Navigate to="/login" replace /> }
->>>>>>> c0b98f778f357874042dd212bf3aef81d3d993a2
 ]);
 
 createRoot(document.getElementById("root")).render(
