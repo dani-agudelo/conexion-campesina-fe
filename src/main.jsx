@@ -9,12 +9,20 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CssBaseline from "@mui/material/CssBaseline";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
-import ProducerProducts from "./pages/ProducerProducts";
 import CatalogPage from "./pages/CatalogProducts";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { MainLayout } from "./layouts/MainLayout";
+import { AdminLayout } from "./layouts/AdminLayout";
+import { ClientLayout } from "./layouts/ClientLayout";
+import { ProducerLayout } from "./layouts/ProducerLayout";
 import { UserRole } from "./types/enums";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { UsersPage } from "./pages/Users/Users";
+import { ProfilePage } from './pages/Profile/Profile';
+import ProductsPage from "./pages/ProducerProducts/ProductsPage";
+import OrdersPage from "./pages/ProducerProducts/OrdersPage";
+import ClientOrdersTable from "./components/client/ClientOrdersTable";
+import { Navbar } from "./components/ui/navbar/Navbar";
 
 const queryClient = new QueryClient();
 
@@ -30,30 +38,78 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
-        path: "/product-management",
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
-            <ProducerProducts />
-          </ProtectedRoute>
-        ),
+        element: <AdminLayout />,
+        children: [
+          {
+            path: '/users',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
+                <UsersPage />
+              </ProtectedRoute>
+            )
+          }
+        ]
       },
       {
-        path: "/catalog",
+        path: '/profile',
         element: (
-          <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
-            <CatalogPage />
-          </ProtectedRoute>
-        ),
+          <>
+            <Navbar />
+            <ProtectedRoute allowedRoles={[UserRole.CLIENT, UserRole.PRODUCER]}>
+              <ProfilePage />
+            </ProtectedRoute>
+          </>
+        )
+      },
+      {
+        element: <ProducerLayout />,
+        children: [
+          {
+            path: "/product-management/products",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+                <ProductsPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/product-management/orders",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+                <OrdersPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/product-management",
+            element: <Navigate to="/product-management/products" replace />,
+          },
+        ]
+      },
+      {
+        element: <ClientLayout />,
+        children: [
+          {
+            path: "/catalog",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+                <CatalogPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/client-orders",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+                <ClientOrdersTable />
+              </ProtectedRoute>
+            ),
+          },
+        ]
       },
     ]
   },
-  { path: "/", element: <Navigate to="/login" replace /> },
-
-
-  // {
-  //   path: '*',
-  //   element: <NotFoundPage />,
-  // },
+  { path: "/", element: <Navigate to="/login" replace /> }
 ]);
 
 createRoot(document.getElementById("root")).render(

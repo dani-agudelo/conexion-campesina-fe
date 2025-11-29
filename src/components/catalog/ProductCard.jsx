@@ -43,7 +43,7 @@ const ProductCard = ({ product }) => {
             staleTime: 1000 * 60 * 10,
         })
     }
-    const { data: producer, isLoading } = useProducer(product.producerId)
+    const { data: producer } = useProducer(product.producerId)
 
     const handleAddToCart = useCallback((quantity) => {
         addItem(product, quantity)
@@ -77,18 +77,13 @@ const ProductCard = ({ product }) => {
                         /{unitSymbols[product.unit] ?? product.unit ?? ''}
                     </span>
                 </span>
-
-                {isLoading ? (
-                    <p >Cargando productor...</p>
-                ) : (
-                    producer && (
-                        <p className="producer">
-                            Vendido por:{' '}
-                            <span className="producer-link">
-                                {producer.fullName}
-                            </span>
-                        </p>
-                    )
+                {producer && (
+                    <p className="producer">
+                        Vendido por:{' '}
+                        <span className="producer-link">
+                            {producer.fullName}
+                        </span>
+                    </p>
                 )}
 
                 <button

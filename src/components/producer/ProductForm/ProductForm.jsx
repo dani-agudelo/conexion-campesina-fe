@@ -77,7 +77,9 @@ const ProductForm = ({ product, onSave, onClose }) => {
       newErrors.quantity = "La cantidad debe ser mayor a 0";
     }
 
-    if (formData.imageUrl && !isValidUrl(formData.imageUrl)) {
+    if (!formData.imageUrl.trim()) {
+      newErrors.imageUrl = "El link de imagen es requerido";
+    } else if (!isValidUrl(formData.imageUrl)) {
       newErrors.imageUrl = "Ingresa una URL válida";
     }
 
@@ -89,7 +91,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
     try {
       new URL(string);
       return true;
-    } catch (_) {
+    } catch {
       return false;
     }
   };
@@ -248,7 +250,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
 
             <div className="product-form__field">
               <label htmlFor="imageUrl" className="product-form__label">
-                Link de imagen
+                Link de imagen *
               </label>
               <input
                 type="url"
