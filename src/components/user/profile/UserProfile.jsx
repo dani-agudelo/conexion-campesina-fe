@@ -1,5 +1,5 @@
 import './UserProfile.css';
-import { useState, useEffect } from 'react'; // Importamos hooks necesarios
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserInfo, updateUserInfo } from '../../../services/users';
 import { showErrorAlert, showSuccessAlert } from '../../../utils/sweetAlert';
@@ -14,7 +14,6 @@ const getInitials = (fullName = "") => {
 const UserProfile = () => {
     const queryClient = useQueryClient();
     
-    // Estado local para los campos del formulario
     const [formData, setFormData] = useState({
         fullName: '',
         address: ''
@@ -26,7 +25,6 @@ const UserProfile = () => {
         refetchOnWindowFocus: false,
     });
 
-    // Sincronizar el estado del formulario cuando llegan los datos del usuario
     useEffect(() => {
         if (user) {
             setFormData({
@@ -47,7 +45,6 @@ const UserProfile = () => {
         }
     });
 
-    // Manejador de cambios en los inputs
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -56,11 +53,9 @@ const UserProfile = () => {
         }));
     };
 
-    // Verificar si hay cambios reales comparando con la data original (user)
     const hasChanges = () => {
         if (!user) return false;
         
-        // Comparamos valores recortados (trim) para evitar falsos positivos por espacios
         const currentName = formData.fullName.trim();
         const currentAddress = formData.address.trim();
         const originalName = (user.fullName || '').trim();
@@ -74,12 +69,10 @@ const UserProfile = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Si no hay cambios, no hacemos nada (aunque el botón debería estar deshabilitado)
         if (!isDirty) return;
 
         const payload = {};
         
-        // Solo agregamos al payload los campos que cambiaron
         const currentName = formData.fullName.trim();
         const currentAddress = formData.address.trim();
         
@@ -91,7 +84,6 @@ const UserProfile = () => {
             payload.address = currentAddress;
         }
 
-        // Enviamos la mutación solo con el objeto 'payload' filtrado
         mutation.mutate(payload);
     };
 
@@ -121,7 +113,6 @@ const UserProfile = () => {
                                     type="text"
                                     id="fullName"
                                     name="fullName"
-                                    // Cambiamos defaultValue por value (input controlado)
                                     value={formData.fullName}
                                     onChange={handleChange}
                                     className="form-input"
@@ -138,7 +129,6 @@ const UserProfile = () => {
                                     type="text"
                                     id="address"
                                     name="address"
-                                    // Cambiamos defaultValue por value
                                     value={formData.address}
                                     onChange={handleChange}
                                     className="form-input"
