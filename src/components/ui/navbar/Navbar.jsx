@@ -90,7 +90,12 @@ const Navbar = () => {
                                 <p className="profile-role">{currentUser.role}</p>
                             </div>
                             <hr className="dropdown-divider" />
-                            <button className="dropdown-btn">Ver perfil</button>
+                            <NavLink
+                                to='profile'
+                                className="dropdown-btn dropdown-link"
+                            >
+                                Ver perfil
+                            </NavLink>
                             <button
                                 className="dropdown-btn logout"
                                 onClick={handleSignOut}
