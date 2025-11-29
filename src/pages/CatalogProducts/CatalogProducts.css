@@ -1,0 +1,33 @@
+.catalog-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.catalog-page__header {
+  flex-shrink: 0;
+  padding: 40px 32px 0 32px;
+  box-sizing: border-box;
+}
+
+.catalog-page__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 32px 40px 32px;
+  box-sizing: border-box;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .catalog-page__header {
+    padding: 24px 16px 0 16px;
+  }
+
+  .catalog-page__content {
+    padding: 0 16px 24px 16px;
+  }
+}
+
