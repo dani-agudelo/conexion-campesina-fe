@@ -30,7 +30,6 @@ const unitSymbols = {
     BOTELLA: 'Botella',
 }
 
-
 const ProductCard = ({ product }) => {
     const [showQuantityModal, setShowQuantityModal] = useState(false)
     const addItem = useCart((state) => state.addItem)

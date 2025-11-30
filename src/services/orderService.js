@@ -15,3 +15,7 @@ export const getClientOrders = async () => {
   return await fetcher('orders/client/me');
 };
 
+export const retryPayment = async (orderId) => {
+  return await fetcher(`orders/${orderId}/retry-payment`);
+};
+

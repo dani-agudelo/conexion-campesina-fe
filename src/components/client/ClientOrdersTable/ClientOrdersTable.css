@@ -58,7 +58,7 @@
 .client-orders__table th:nth-child(4) { width: 11%; } /* TOTAL */
 .client-orders__table th:nth-child(5) { width: 8%; } /* ITEMS */
 .client-orders__table th:nth-child(6) { width: 24%; } /* DIRECCIÓN */
-.client-orders__table th:nth-child(7) { width: 16%; } /* ACCIONES */
+.client-orders__table th:nth-child(7) { width: 22%; } /* ACCIONES */
 
 .client-orders__table thead {
   background: linear-gradient(135deg, #e8f5e8, #d4edda);

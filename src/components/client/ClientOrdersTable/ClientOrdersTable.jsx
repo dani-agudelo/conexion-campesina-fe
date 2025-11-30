@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import "./ClientOrdersTable.css";
 import { useClientOrdersQuery } from "../../../hooks/query/useClientOrders";
 import { Spinner } from "../../ui/spinner/Spinner";
-import { EyeIcon, TruckIcon, XIcon } from "../../icons";
+import { EyeIcon, TruckIcon, XIcon, FileTextIcon } from "../../icons";
+import Swal from 'sweetalert2';
+import { useSearchParams } from 'react-router-dom';
 
 const ordersPerPage = 6;
 
@@ -47,13 +49,41 @@ const getStatusClass = (status) => {
 };
 
 const ClientOrdersTable = () => {
-  const { data: orders = [], isPending, isError } = useClientOrdersQuery();
-  const [currentPage, setCurrentPage] = useState(1);
-
+  const { data: orders = [], isPending, isError } = useClientOrdersQuery(); const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams(); // <-- NUEVO
   const totalPages = useMemo(
     () => Math.ceil(orders.length / ordersPerPage),
     [orders.length]
   );
+
+  const handleViewReceipt = (receiptUrl) => {
+    if (receiptUrl) {
+      window.open(receiptUrl, '_blank');
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Recibo no disponible',
+        text: 'El enlace del recibo aún no está registrado o disponible.',
+        confirmButtonColor: '#ffc107',
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (searchParams.get('payment') === 'success') {
+
+      Swal.fire({
+        icon: 'success',
+        title: '¡Pago Exitoso!',
+        text: 'Tu orden ha sido pagada y creada exitosamente. Revisa el estado de tu pedido.',
+        confirmButtonColor: '#52a318',
+        confirmButtonText: 'Aceptar',
+      });
+
+      searchParams.delete('payment');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]); // Dependencias requeridas
 
   useEffect(() => {
     if (totalPages === 0) {
@@ -82,7 +112,7 @@ const ClientOrdersTable = () => {
       const sequence = String(startIndex + index + 1).padStart(3, "0");
       return `#CC-${year}${month}-${sequence}`;
     }
-
+    console.log("recibo url", order?.receiptUrl);
     return `#CC-${(order?.id || "").slice(0, 6).toUpperCase()}`;
   };
 
@@ -158,6 +188,7 @@ const ClientOrdersTable = () => {
                         <button
                           type="button"
                           className="client-orders__button client-orders__button--icon"
+                          style={{ color: '#10b981', borderColor: '#10b981' }}
                           onClick={() => {
                             console.info("Ver detalles del pedido:", order.id);
                           }}
@@ -192,6 +223,18 @@ const ClientOrdersTable = () => {
                             <TruckIcon size={18} />
                           </button>
                         )}
+                        {/* Botón de Ver Recibo de Pago */}
+                        {order.status === "PAID" && (
+                          <button
+                            type="button"
+                            className="client-orders__button client-orders__button--secondary client-orders__button--icon"
+                            onClick={() => handleViewReceipt(order.orderReceipt.receiptUrl)} 
+                            aria-label="Ver recibo de pago"
+                            title="Ver recibo de pago"
+                          >
+                            <FileTextIcon size={18} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -220,9 +263,8 @@ const ClientOrdersTable = () => {
                     <button
                       key={page}
                       type="button"
-                      className={`client-orders__page-button ${
-                        page === currentPage ? "client-orders__page-button--active" : ""
-                      }`}
+                      className={`client-orders__page-button ${page === currentPage ? "client-orders__page-button--active" : ""
+                        }`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
