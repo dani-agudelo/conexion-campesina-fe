@@ -1,5 +1,5 @@
 import { Star, Edit } from "lucide-react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   useCreateReviewMutation,
   useUpdateReviewMutation,
@@ -196,7 +196,7 @@ const ReviewModal = ({
     onReviewSubmitted,
   ]);
 
-  // Abrir automáticamente el modal cuando se pasa una reseña existente
+  // Abrir automáticamente el modal cuando existingReview cambia de ID
   useEffect(() => {
     if (existingReview) {
       handleOpenReviewModal();

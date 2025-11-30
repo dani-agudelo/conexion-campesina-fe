@@ -53,7 +53,8 @@ const ProductCard = ({ product }) => {
     [product, addItem]
   );
 
-  const handleOpenModal = useCallback(() => {
+  const handleOpenModal = useCallback((e) => {
+    e.stopPropagation();
     setShowQuantityModal(true);
   }, []);
 
@@ -98,6 +99,7 @@ const ProductCard = ({ product }) => {
             <span className="producer-link">{producer.fullName}</span>
           </p>
         )}
+
         <button className="add-btn" onClick={handleOpenModal}>
           <AddToCartIcon /> Agregar al Carrito
         </button>

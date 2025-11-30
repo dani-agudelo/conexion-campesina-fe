@@ -84,7 +84,6 @@ const ClientOrdersTable = () => {
   const startIndex = (currentPage - 1) * ordersPerPage;
   const paginatedOrders = orders.slice(startIndex, startIndex + ordersPerPage);
 
-  // CORRECCIÓN: Llamar a los hooks FUERA del map, para todas las órdenes paginadas
   const shippingQueries = [
     useShippingByOrder(paginatedOrders[0]?.id),
     useShippingByOrder(paginatedOrders[1]?.id),
@@ -187,6 +186,7 @@ const ClientOrdersTable = () => {
                 {paginatedOrders.map((order, index) => {
                   const { data: shipping, isLoading: loadingShipping } =
                     shippingQueries[index];
+                  if (loadingShipping) return null;
                   return (
                     <tr key={order.id}>
                       <td className="client-orders__id">
@@ -241,19 +241,12 @@ const ClientOrdersTable = () => {
                             </button>
                           )}
                           {/* Botones de comprobante de envío - disponibles para pedidos PAID, DELIVERED o PENDING (prueba) */}
-                          {(order.status === "PAID" || order.status === "DELIVERED" || order.status === "PENDING") && (
+                          {(order.status === "PAID" ||
+                            order.status === "DELIVERED" ||
+                            order.status === "PENDING") && (
                             <>
-                              {loadingShipping ? (
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--icon"
-                                  disabled
-                                  aria-label="Cargando información de envío"
-                                  title="Cargando..."
-                                >
-                                  <Spinner size={18} />
-                                </button>
-                              ) : shipping && shipping.id ? (
+                              {loadingShipping ? null : shipping &&
+                                shipping.id ? (
                                 // SI EXISTE el comprobante - Mostrar botón de descarga
                                 <button
                                   type="button"
@@ -265,9 +258,8 @@ const ClientOrdersTable = () => {
                                   aria-label="Descargar comprobante de envío"
                                   title="Descargar comprobante de envío"
                                 >
-                                  {shippingLoading[order.id] === "downloading" ? (
-                                    <Spinner size={18} />
-                                  ) : (
+                                  {shippingLoading[order.id] ===
+                                  "downloading" ? null : (
                                     <DownloadIcon size={18} />
                                   )}
                                 </button>
@@ -307,9 +299,8 @@ const ClientOrdersTable = () => {
                                   aria-label="Generar comprobante de envío"
                                   title="Generar comprobante de envío"
                                 >
-                                  {shippingLoading[order.id] === "generating" ? (
-                                    <Spinner size={18} />
-                                  ) : (
+                                  {shippingLoading[order.id] ===
+                                  "generating" ? null : (
                                     <FilePlusIcon size={18} />
                                   )}
                                 </button>

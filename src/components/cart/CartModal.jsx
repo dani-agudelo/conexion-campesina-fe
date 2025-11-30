@@ -61,7 +61,7 @@ const CartModal = ({ isOpen, onClose }) => {
       setErrorMessage('Error al crear la orden. Por favor intenta nuevamente.');
       const msg = error.message.includes('URL de pago') 
         ? 'Error en la pasarela de pago. Intenta más tarde.'
-        : error.message || 'Error al crear la orden. Por favor intenta nuevamente.';
+        : 'Error al crear la orden. Por favor intenta nuevamente.';
         
       Swal.fire({
           icon: 'error',

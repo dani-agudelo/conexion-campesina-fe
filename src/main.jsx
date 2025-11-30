@@ -19,7 +19,7 @@ import { ProducerLayout } from "./layouts/ProducerLayout";
 import { UserRole } from "./types/enums";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UsersPage } from "./pages/Users/Users";
-import { ProfilePage } from './pages/Profile/Profile';
+import { ProfilePage } from "./pages/Profile/Profile";
 import ProductsPage from "./pages/ProducerProducts/ProductsPage";
 import OrdersPage from "./pages/ProducerProducts/OrdersPage";
 import ClientOrdersTable from "./components/client/ClientOrdersTable";
@@ -47,17 +47,17 @@ const router = createBrowserRouter([
             element: <PaymentSuccessPage />, // No necesita ProtectedRoute
           },
           {
-            path: '/users',
+            path: "/users",
             element: (
-              <ProtectedRoute allowedRoles={[UserRole.ADMIN]} >
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
                 <UsersPage />
               </ProtectedRoute>
-            )
-          }
-        ]
+            ),
+          },
+        ],
       },
       {
-        path: '/profile',
+        path: "/profile",
         element: (
           <>
             <Navbar />
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
               <ProfilePage />
             </ProtectedRoute>
           </>
-        )
+        ),
       },
       {
         element: <ProducerLayout />,
@@ -90,19 +90,20 @@ const router = createBrowserRouter([
             path: "/product-management",
             element: <Navigate to="/product-management/products" replace />,
           },
-        ]
+        ],
       },
-      {
-        path: "/product/:productId",
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
-            <ProductDetail />
-          </ProtectedRoute>
-        ),
-      },
+
       {
         element: <ClientLayout />,
         children: [
+          {
+            path: "/product/:productId",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+                <ProductDetail />
+              </ProtectedRoute>
+            ),
+          },
           {
             path: "/catalog",
             element: (
@@ -119,11 +120,11 @@ const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-        ]
+        ],
       },
-    ]
+    ],
   },
-  { path: "/", element: <Navigate to="/login" replace /> }
+  { path: "/", element: <Navigate to="/login" replace /> },
 ]);
 
 createRoot(document.getElementById("root")).render(

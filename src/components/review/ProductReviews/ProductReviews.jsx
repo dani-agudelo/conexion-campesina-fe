@@ -55,7 +55,7 @@ const ProductReviews = ({ reviews, summary, onEditReview }) => {
       } catch (error) {
         Swal.fire({
           title: "Error",
-          text: "No se pudo eliminar la reseña. Intenta nuevamente.",
+          text: `No se pudo eliminar la reseña. Intenta nuevamente.${error.message[0]} `,
           icon: "error",
           confirmButtonText: "Cerrar",
           customClass: {
