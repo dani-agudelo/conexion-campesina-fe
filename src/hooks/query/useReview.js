@@ -51,10 +51,6 @@ export const useCreateReviewMutation = () => {
       queryClient.invalidateQueries(["reviewSummary", variables.productOfferId]);
       queryClient.invalidateQueries(["hasReviewed", variables.productOfferId]);
     },
-    onError: (error) => {
-      console.error("Error al crear la reseña:", error);
-      showErrorAlert("Hubo un error en la creación de la reseña");
-    },
   });
 };
 
@@ -68,10 +64,6 @@ export const useUpdateReviewMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["reviewSummary"] });
       queryClient.invalidateQueries({ queryKey: ["hasReviewed"] });
     },
-    onError: (error) => {
-      console.error("Error al actualizar la reseña:", error);
-      showErrorAlert("Hubo un error en la actualización de la reseña");
-    },
   });
 };
 
@@ -84,10 +76,6 @@ export const useDeleteReviewMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       queryClient.invalidateQueries({ queryKey: ["reviewSummary"] });
       queryClient.invalidateQueries({ queryKey: ["hasReviewed"] });
-    },
-    onError: (error) => {
-      console.error("Error al eliminar la reseña:", error);
-      showErrorAlert("Hubo un error en la eliminación de la reseña");
     },
   });
 };
