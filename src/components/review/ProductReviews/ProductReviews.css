@@ -87,9 +87,11 @@
 }
 
 .star-label {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: #666;
-  width: 40px;
+  width: 80px;
+  min-width: 80px;
+  text-align: left;
 }
 
 .bar-background {
