@@ -10,7 +10,6 @@ const CartModal = ({ isOpen, onClose }) => {
   const removeItem = useCart((state) => state.removeItem);
   const clearCart = useCart((state) => state.clearCart);
   
-  const [address, setAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -28,11 +27,6 @@ const CartModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleCheckout = async () => {
-    if (!address.trim()) {
-      setErrorMessage('Por favor ingresa una dirección de entrega');
-      return;
-    }
-
     if (items.length === 0) {
       setErrorMessage('El carrito está vacío');
       return;
@@ -43,7 +37,6 @@ const CartModal = ({ isOpen, onClose }) => {
 
     try {
       const orderData = {
-        address: address.trim(),
         orderDetails: items.map((item) => ({
           productOfferId: item.productOfferId,
           quantity: item.quantity,
@@ -59,7 +52,6 @@ const CartModal = ({ isOpen, onClose }) => {
       }
 
       clearCart();
-      setAddress('');
       onClose();
 
       window.location.href = paymentUrl;
@@ -144,22 +136,9 @@ const CartModal = ({ isOpen, onClose }) => {
                     <div className="cart-total">
                       <h3>Total: ${totalPrice.toLocaleString()}</h3>
                     </div>
-                    <div className="address-input">
-                      <label htmlFor="address">Dirección de entrega:</label>
-                      <textarea
-                        id="address"
-                        value={address}
-                        onChange={(e) => {
-                          setAddress(e.target.value);
-                          setErrorMessage('');
-                        }}
-                        placeholder="Ingresa la dirección de entrega completa"
-                        rows="3"
-                      />
-                      {errorMessage && (
-                        <p className="error-message">{errorMessage}</p>
-                      )}
-                    </div>
+                    {errorMessage && (
+                      <p className="error-message">{errorMessage}</p>
+                    )}
                     <button
                       className="checkout-btn"
                       onClick={handleCheckout}
