@@ -81,7 +81,10 @@ const ProductOverview = ({ product, summary }) => {
             {renderStars(summary?.averageRating || 0)}
           </div>
           <span className="review-count">
-            ({summary?.totalReviews || 0} reviews)
+            {(() => {
+              const total = summary?.totalReviews || 0;
+              return `(${total} reseñ${total === 1 ? 'a' : 'as'})`;
+            })()}
           </span>
         </div>
 
@@ -92,7 +95,7 @@ const ProductOverview = ({ product, summary }) => {
 
         <button className="add-to-cart-btn" onClick={handleOpenModal}>
           <ShoppingCart size={20} />
-          <span>Add to Cart</span>
+          <span>Añadir al carrito</span>
         </button>
         <QuantityModal
           isOpen={showQuantityModal}
