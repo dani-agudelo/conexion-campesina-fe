@@ -1,5 +1,5 @@
 import { Star, Edit } from "lucide-react";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   useCreateReviewMutation,
   useUpdateReviewMutation,
@@ -7,18 +7,63 @@ import {
 import Swal from "sweetalert2";
 import "./ReviewModal.css";
 
+// 💡 Función auxiliar corregida para manejar errores anidados como cadena JSON
+const getBackendErrorMessage = (error) => {
+  let errorData = null;
+
+  // 1. Intentar parsear si el mensaje es una cadena JSON
+  try {
+    // Si el error.message es una cadena JSON (como en tu terminal), la parseamos
+    errorData = JSON.parse(error.message);
+  } catch (e) {
+    // Si no es una cadena JSON (es un objeto Error normal o una respuesta HTTP directa)
+    errorData = error.response?.data || error;
+  }
+
+  // 2. Extraer el mensaje específico
+  if (errorData && errorData.message) {
+    // Si 'message' es un array, lo unimos (Ej: ["comments must be longer..."])
+    if (Array.isArray(errorData.message) && errorData.message.length > 0) {
+      // Traducir mensajes comunes del backend al español si es posible
+      const translatedMessages = errorData.message.map((msg) => {
+        if (msg.includes("comments must be longer than or equal to")) {
+          const length = msg.match(/(\d+)/)?.[0] || "10";
+          return `El comentario debe tener al menos ${length} caracteres.`;
+        }
+        return msg;
+      });
+      return translatedMessages.join("; ");
+    }
+
+    // Si 'message' es un string simple
+    return errorData.message;
+  }
+
+  // 3. Fallback para otros errores o estructura desconocida
+  return "Error desconocido. Por favor, inténtalo de nuevo.";
+};
+
 const ReviewModal = ({
   productId,
   existingReview = null,
+  open = false,
+  onClose,
   onReviewSubmitted,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(open);
   const createReview = useCreateReviewMutation();
   const updateReview = useUpdateReviewMutation();
 
   const isEditMode = !!existingReview;
 
+  // Sincronizar estado abierto con prop open
+  useEffect(() => {
+    setIsOpen(open);
+  }, [open]);
+
   const handleOpenReviewModal = useCallback(() => {
+    setIsOpen(true);
     Swal.fire({
       title: isEditMode ? "Editar tu Reseña" : "Dejar una Reseña",
       html: `
@@ -171,21 +216,27 @@ const ReviewModal = ({
             onReviewSubmitted();
           }
         } catch (error) {
+          // 💡 Manejo de errores corregido
+          const errorMessage = getBackendErrorMessage(error);
+
           Swal.fire({
-            title: "Error",
-            text: isEditMode
-              ? "No se pudo actualizar tu reseña. Intenta nuevamente."
-              : "No se pudo enviar tu reseña. Intenta nuevamente.",
+            title: "Error de Validación",
+            text: `No se pudo procesar tu reseña: ${errorMessage}`, // Muestra el mensaje específico del backend
             icon: "error",
             confirmButtonText: "Cerrar",
             customClass: {
               confirmButton: "review-confirm-btn",
             },
           });
+          // Opcional: registrar el error completo en la consola para depuración
+          console.error("Error al procesar la reseña:", error);
         } finally {
           setIsSubmitting(false);
         }
       }
+      // Cerrar modal al enviar o cancelar
+      setIsOpen(false);
+      if (onClose) onClose();
     });
   }, [
     productId,
@@ -194,16 +245,17 @@ const ReviewModal = ({
     createReview,
     updateReview,
     onReviewSubmitted,
+    onClose,
   ]);
 
-  // Abrir automáticamente el modal cuando existingReview cambia de ID
+  // Modal controlado: abrir si isOpen es true, usando useEffect para evitar bucles
   useEffect(() => {
-    if (existingReview) {
+    if (isEditMode && isOpen) {
       handleOpenReviewModal();
     }
-  }, [existingReview, handleOpenReviewModal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode, isOpen]);
 
-  // Si es modo edición, no mostrar el botón (se abre automáticamente)
   if (isEditMode) {
     return null;
   }
