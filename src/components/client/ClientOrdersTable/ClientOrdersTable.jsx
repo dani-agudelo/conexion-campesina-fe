@@ -8,6 +8,7 @@ import {
   XIcon,
   DownloadIcon,
   FilePlusIcon,
+  FileTextIcon
 } from "../../icons";
 import {
   useShippingByOrder,
@@ -83,6 +84,7 @@ const ClientOrdersTable = () => {
   const startIndex = (currentPage - 1) * ordersPerPage;
   const paginatedOrders = orders.slice(startIndex, startIndex + ordersPerPage);
 
+  // CORRECCIÓN: Llamar a los hooks FUERA del map, para todas las órdenes paginadas
   const shippingQueries = [
     useShippingByOrder(paginatedOrders[0]?.id),
     useShippingByOrder(paginatedOrders[1]?.id),
@@ -185,7 +187,6 @@ const ClientOrdersTable = () => {
                 {paginatedOrders.map((order, index) => {
                   const { data: shipping, isLoading: loadingShipping } =
                     shippingQueries[index];
-                  if (loadingShipping) return null;
                   return (
                     <tr key={order.id}>
                       <td className="client-orders__id">
@@ -240,12 +241,19 @@ const ClientOrdersTable = () => {
                             </button>
                           )}
                           {/* Botones de comprobante de envío - disponibles para pedidos PAID, DELIVERED o PENDING (prueba) */}
-                          {(order.status === "PAID" ||
-                            order.status === "DELIVERED" ||
-                            order.status === "PENDING") && (
+                          {(order.status === "PAID" || order.status === "DELIVERED" || order.status === "PENDING") && (
                             <>
-                              {loadingShipping ? null : shipping &&
-                                shipping.id ? (
+                              {loadingShipping ? (
+                                <button
+                                  type="button"
+                                  className="client-orders__button client-orders__button--icon"
+                                  disabled
+                                  aria-label="Cargando información de envío"
+                                  title="Cargando..."
+                                >
+                                  <Spinner size={18} />
+                                </button>
+                              ) : shipping && shipping.id ? (
                                 // SI EXISTE el comprobante - Mostrar botón de descarga
                                 <button
                                   type="button"
@@ -257,8 +265,9 @@ const ClientOrdersTable = () => {
                                   aria-label="Descargar comprobante de envío"
                                   title="Descargar comprobante de envío"
                                 >
-                                  {shippingLoading[order.id] ===
-                                  "downloading" ? null : (
+                                  {shippingLoading[order.id] === "downloading" ? (
+                                    <Spinner size={18} />
+                                  ) : (
                                     <DownloadIcon size={18} />
                                   )}
                                 </button>
@@ -298,13 +307,28 @@ const ClientOrdersTable = () => {
                                   aria-label="Generar comprobante de envío"
                                   title="Generar comprobante de envío"
                                 >
-                                  {shippingLoading[order.id] ===
-                                  "generating" ? null : (
+                                  {shippingLoading[order.id] === "generating" ? (
+                                    <Spinner size={18} />
+                                  ) : (
                                     <FilePlusIcon size={18} />
                                   )}
                                 </button>
                               )}
                             </>
+                          )}
+                          {/* Botón para ver recibo (Tu cambio recuperado) */}
+                          {order.status === "PAID" && (
+                            <button
+                              type="button"
+                              className="client-orders__button client-orders__button--secondary client-orders__button--icon"
+                              onClick={() => {
+                                if (order.orderReceipt?.receiptUrl) window.open(order.orderReceipt.receiptUrl, '_blank');
+                              }}
+                              aria-label="Ver recibo de pago"
+                              title="Ver recibo de pago"
+                            >
+                              <FileTextIcon size={18} />
+                            </button>
                           )}
                         </div>
                       </td>
@@ -337,11 +361,10 @@ const ClientOrdersTable = () => {
                     <button
                       key={page}
                       type="button"
-                      className={`client-orders__page-button ${
-                        page === currentPage
+                      className={`client-orders__page-button ${page === currentPage
                           ? "client-orders__page-button--active"
                           : ""
-                      }`}
+                        }`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}

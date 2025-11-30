@@ -24,6 +24,7 @@ import ProductsPage from "./pages/ProducerProducts/ProductsPage";
 import OrdersPage from "./pages/ProducerProducts/OrdersPage";
 import ClientOrdersTable from "./components/client/ClientOrdersTable";
 import { Navbar } from "./components/ui/navbar/Navbar";
+import PaymentSuccessPage from "./pages/PaymentSuccess/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         element: <AdminLayout />,
         children: [
+          {
+            path: "/payment/success",
+            element: <PaymentSuccessPage />, // No necesita ProtectedRoute
+          },
           {
             path: "/users",
             element: (

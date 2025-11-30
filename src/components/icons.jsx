@@ -153,3 +153,29 @@ export function FilePlusIcon({ size = 16, style = {}, ...props }) {
 }
 
 
+// ... después de XIcon() ...
+
+export function FileTextIcon({ size = 16, style = {}, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor" // Usamos stroke en lugar de fill="none"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      {...props}
+    >
+      {/* Forma principal del recibo / papel */}
+      <path d="M4 1.5L8 3L12 1.5V14.5H4V1.5Z" />
+      {/* Líneas simulando texto/contenido del recibo */}
+      <path d="M6 6H10" />
+      <path d="M6 8H10" />
+      <path d="M6 10H8" />
+    </svg>
+  );
+}

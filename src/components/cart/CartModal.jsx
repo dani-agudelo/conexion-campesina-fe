@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { useCart } from '../../state/cart';
 import { createOrder } from '../../services/orderService';
 import './CartModal.css';
 
 const CartModal = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
   const items = useCart((state) => state.items);
   const updateQuantity = useCart((state) => state.updateQuantity);
   const removeItem = useCart((state) => state.removeItem);
@@ -45,31 +43,32 @@ const CartModal = ({ isOpen, onClose }) => {
         })),
       };
 
-      await createOrder(orderData);
-      
+      const response = await createOrder(orderData);
+
+      const paymentUrl = response.paymentSession?.url;
+
+      if (!paymentUrl) {
+          throw new Error("El servicio de órdenes no devolvió la URL de pago.");
+      }
+
       clearCart();
       onClose();
-      
-      Swal.fire({
-        icon: 'success',
-        title: '¡Orden creada exitosamente!',
-        text: 'Redirigiendo al catálogo...',
-        confirmButtonColor: '#4caf50',
-        confirmButtonText: 'Continuar',
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: true,
-        allowOutsideClick: false,
-        customClass: {
-          popup: 'swal-success-custom',
-          confirmButton: 'swal-confirm-button-custom'
-        }
-      }).then(() => {
-        navigate('/catalog');
-      });
+
+      window.location.href = paymentUrl;
+
     } catch (error) {
       console.error('Error al crear la orden:', error);
       setErrorMessage('Error al crear la orden. Por favor intenta nuevamente.');
+      const msg = error.message.includes('URL de pago') 
+        ? 'Error en la pasarela de pago. Intenta más tarde.'
+        : 'Error al crear la orden. Por favor intenta nuevamente.';
+        
+      Swal.fire({
+          icon: 'error',
+          title: 'Error de Compra',
+          text: msg,
+          confirmButtonColor: '#d33'
+      });
     } finally {
       setIsProcessing(false);
     }
