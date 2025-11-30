@@ -12,6 +12,8 @@ export const SIDEBAR_LINKS = {
     [UserRole.PRODUCER]: [
         { id: 'products', label: 'Mis Productos', path: '/product-management/products' },
         { id: 'orders', label: 'Mis pedidos', path: '/product-management/orders' },
+        // { id: 'inventory', label: 'Mi Inventario', path: '/product-management/inventory' },
+
     ],
     [UserRole.CLIENT]: [
         { id: 'catalog', label: 'Catálogo', path: '/catalog' },

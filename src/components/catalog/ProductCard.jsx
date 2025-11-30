@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 import "./Products.css";
 
 const unitSymbols = {
-  KILOGRAMO: 'Kg',
+  KILOGRAMO: 'kg',
   GRAMO: 'g',
   LITRO: 'L',
   MILILITRO: 'mL',
@@ -75,30 +75,27 @@ const ProductCard = ({ product }) => {
       <div className="product-image">
         <img src={product.imageUrl} alt={product.name} />
       </div>
-      <span className="price">
-        ${product.price}{' '}
-        <span className="unit">
-          /{unitSymbols[product.unit] ?? product.unit ?? ''}
-        </span>
-      </span>
-      {producer && (
-        <p className="producer">
-          Vendido por:{' '}
-          <span className="producer-link">
-            {producer.fullName}
-          </span>
-        </p>
-      )}
+
       <div className="product-info">
         <h2>{product.name}</h2>
-        <p>{product.description}</p>
 
         {producer && (
           <p className="producer">
-            Vendido por:{" "}
-            <span className="producer-link">{producer.fullName}</span>
+            Vendido por:{' '}
+            <span className="producer-link">
+              {producer.fullName}
+            </span>
           </p>
         )}
+        
+        <p className="description">{product.description}</p>
+
+        <div className="price">
+          ${product.price}
+          <span className="unit">
+            {' '}/{unitSymbols[product.unit] ?? product.unit ?? ''}
+          </span>
+        </div>
 
         <button className="add-btn" onClick={handleOpenModal}>
           <AddToCartIcon /> Agregar al Carrito

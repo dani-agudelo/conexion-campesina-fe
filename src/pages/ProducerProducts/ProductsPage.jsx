@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ProductList from "../../components/producer/ProductList";
 import ProductForm from "../../components/producer/ProductForm";
+import InventoryForm from "../../components/producer/InventoryForm";
 import "./ProducerProducts.css";
 import {
   useProductProducerQuery,
@@ -8,10 +9,14 @@ import {
   useUpdateProductMutation,
   useDeleteProductMutation,
 } from "../../hooks/query/useProductProducer";
-import { showSuccessAlert, showConfirmDialog} from "../../utils/sweetAlert";
+import { showSuccessAlert, showConfirmDialog, showErrorAlert } from "../../utils/sweetAlert";
 
 const ProductsPage = () => {
   const [showForm, setShowForm] = useState(false);
+
+  const [showInventoryForm, setShowInventoryForm] = useState(false);
+  const [createdProductId, setCreatedProductId] = useState(null);
+
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -27,6 +32,7 @@ const ProductsPage = () => {
 
   const handleAddProduct = () => {
     setEditingProduct(null);
+    setCreatedProductId(null);
     setShowForm(true);
   };
 
@@ -37,7 +43,7 @@ const ProductsPage = () => {
 
   const handleDeleteProduct = async (productId) => {
     const confirmed = await showConfirmDialog("¿Deseas eliminar este producto?");
-    
+
     if (confirmed) {
       try {
         await deleteProductMutation.mutateAsync(productId);
@@ -48,7 +54,7 @@ const ProductsPage = () => {
     }
   };
 
-  const handleSaveProduct = async (productData) => {
+  const handleProductFormSubmit = async (productData) => {
     try {
       if (editingProduct) {
         await updateProductMutation.mutateAsync({
@@ -56,21 +62,51 @@ const ProductsPage = () => {
           productData: productData
         });
         showSuccessAlert("Producto actualizado exitosamente");
+        setShowForm(false);
+        setEditingProduct(null);
       } else {
-        await createProductMutation.mutateAsync(productData);
-        showSuccessAlert("Producto creado exitosamente");
-      }
+        const response = await createProductMutation.mutateAsync(productData);
 
-      setShowForm(false);
-      setEditingProduct(null);
+        const newId = response.id || response.data?.id;
+
+        if (newId) {
+          setCreatedProductId(newId);
+          setShowForm(false);
+          setShowInventoryForm(true);
+        } else {
+          showErrorAlert("No se pudo crear el producto, intenta más tarde")
+        }
+      }
     } catch (error) {
-      console.error("Error al guardar producto:", error);
+      console.error("Error al guardar el producto:", error);
     }
+  };
+
+  const handleInventoryFormSubmit = (inventoryData) => {
+    const payload = {
+      productOfferId: createdProductId,
+      available_quantity: inventoryData.quantity,
+      unit: inventoryData.unit,
+      minimum_threshold: inventoryData.minThreshold,
+      maximum_capacity: inventoryData.maxCapacity
+    };
+
+    console.log("Payload para inventario:", JSON.stringify(payload, null, 2));
+
+    showSuccessAlert("Producto creado (Inventario impreso en consola)");
+
+    setShowInventoryForm(false);
+    setCreatedProductId(null);
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingProduct(null);
+  };
+
+  const handleCloseInventoryForm = () => {
+    setShowInventoryForm(false);
+    setCreatedProductId(null);
   };
 
   const handleSearch = (term) => {
@@ -89,7 +125,6 @@ const ProductsPage = () => {
     setCurrentPage(1);
   };
 
-  // Filtrar productos
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -108,12 +143,7 @@ const ProductsPage = () => {
   );
 
   const categories = [
-    "vegetales",
-    "frutas",
-    "proteinas",
-    "lacteos",
-    "granos",
-    "otros",
+    "vegetales", "frutas", "proteinas", "lacteos", "granos", "otros",
   ];
 
   return (
@@ -193,11 +223,10 @@ const ProductsPage = () => {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
-              className={`producer-products__pagination-btn ${
-                currentPage === page
-                  ? "producer-products__pagination-btn--active"
-                  : ""
-              }`}
+              className={`producer-products__pagination-btn ${currentPage === page
+                ? "producer-products__pagination-btn--active"
+                : ""
+                }`}
               onClick={() => setCurrentPage(page)}
             >
               {page}
@@ -219,8 +248,15 @@ const ProductsPage = () => {
       {showForm && (
         <ProductForm
           product={editingProduct}
-          onSave={handleSaveProduct}
+          onSave={handleProductFormSubmit}
           onClose={handleCloseForm}
+        />
+      )}
+
+      {showInventoryForm && (
+        <InventoryForm
+          onSave={handleInventoryFormSubmit}
+          onCancel={handleCloseInventoryForm}
         />
       )}
     </div>
@@ -228,4 +264,3 @@ const ProductsPage = () => {
 };
 
 export default ProductsPage;
-

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./ProductForm.css";
 import { useProductBaseQuery } from "../../../hooks/query/useProductBase";
-import {UNITS} from '../../../types/enums';
+import { UNITS } from '../../../types/enums';
 
 const ProductForm = ({ product, onSave, onClose }) => {
   const [formData, setFormData] = useState({
-    productBaseId: "", 
+    productBaseId: "",
     name: "",
     description: "",
     price: "",
@@ -13,6 +13,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
     unit: "KILOGRAMO",
     imageUrl: "",
     isAvailable: true,
+    saleUnit: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -27,13 +28,14 @@ const ProductForm = ({ product, onSave, onClose }) => {
         name: product.name || "",
         description: product.description || "",
         price: product.price || "",
-        quantity: product.quantity || "",
         unit: product.unit || "KILOGRAMO",
         imageUrl: product.imageUrl || "",
-        isAvailable: product.isAvailable !== undefined ? product.isAvailable : true,
+        isAvailable: product.isAvailable ?? true,
+        saleUnit: product.saleUnit || "",  // ← FALTABA
       });
     }
   }, [product]);
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -73,14 +75,14 @@ const ProductForm = ({ product, onSave, onClose }) => {
       newErrors.price = "El precio debe ser mayor a 0";
     }
 
-    if (!formData.quantity || formData.quantity <= 0) {
-      newErrors.quantity = "La cantidad debe ser mayor a 0";
-    }
-
     if (!formData.imageUrl.trim()) {
       newErrors.imageUrl = "El link de imagen es requerido";
     } else if (!isValidUrl(formData.imageUrl)) {
       newErrors.imageUrl = "Ingresa una URL válida";
+    }
+
+    if (!formData.saleUnit) {
+      newErrors.saleUnit = "Debes seleccionar la presentación de venta";
     }
 
     setErrors(newErrors);
@@ -106,13 +108,102 @@ const ProductForm = ({ product, onSave, onClose }) => {
     setIsSubmitting(true);
 
     try {
+      let finalUnit = "GRAMO";
+      let finalQuantity = 1;
+
+      switch (formData.saleUnit) {
+
+        // --- TUS OPCIONES ACTUALES ---
+        case "KILOGRAMO":
+          finalUnit = "KILOGRAMO";
+          finalQuantity = 1;
+          break;
+
+        case "LIBRA":
+          finalUnit = "GRAMO";
+          finalQuantity = 500; // equivalente a media libra
+          break;
+
+        case "GR_500":
+          finalUnit = "GRAMO";
+          finalQuantity = 500;
+          break;
+
+        case "GR_250":
+          finalUnit = "GRAMO";
+          finalQuantity = 250;
+          break;
+
+
+        // --- NUEVAS OPCIONES PROPUESTAS ---
+
+        // 🍶 Litro
+        case "LITRO":
+          finalUnit = "LITRO";
+          finalQuantity = 1;
+          break;
+
+        // 🥤 Medio litro (500 ml)
+        case "ML_500":
+          finalUnit = "MILILITRO";
+          finalQuantity = 500;
+          break;
+
+        // 🥤 Cuarto de litro (250 ml)
+        case "ML_250":
+          finalUnit = "MILILITRO";
+          finalQuantity = 250;
+          break;
+
+        // 🥚 Docena
+        case "DOCENA":
+          finalUnit = "UNIDAD";
+          finalQuantity = 12;
+          break;
+
+        // 🥚 Unidad (para huevos, frutas grandes, etc.)
+        case "UNIDAD":
+          finalUnit = "UNIDAD";
+          finalQuantity = 1;
+          break;
+
+        // 🍌 Manojo / atado
+        case "MANOJO":
+          finalUnit = "UNIDAD";
+          finalQuantity = 1;
+          break;
+
+        // 🧅 Bulto de 5kg
+        case "BULTO_5KG":
+          finalUnit = "KILOGRAMO";
+          finalQuantity = 5;
+          break;
+
+        // 🧅 Bulto de 10kg
+        case "BULTO_10KG":
+          finalUnit = "KILOGRAMO";
+          finalQuantity = 10;
+          break;
+
+        // 🥬 Canastilla (usualmente 20kg)
+        case "CANASTILLA_20KG":
+          finalUnit = "KILOGRAMO";
+          finalQuantity = 20;
+          break;
+
+        default:
+          finalUnit = "GRAMO";
+          finalQuantity = 1;
+      }
+
+
       const productData = {
         productBaseId: formData.productBaseId,
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
-        quantity: parseFloat(formData.quantity),
-        unit: formData.unit,
+        unit: finalUnit,
+        quantity: finalQuantity,
         imageUrl: formData.imageUrl || undefined,
         isAvailable: formData.isAvailable,
       };
@@ -170,9 +261,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="productBaseId"
                 value={formData.productBaseId}
                 onChange={handleInputChange}
-                className={`product-form__select ${
-                  errors.productBaseId ? "product-form__select--error" : ""
-                }`}
+                className={`product-form__select ${errors.productBaseId ? "product-form__select--error" : ""
+                  }`}
                 disabled={isSubmitting || loadingBases}
               >
                 <option value="">
@@ -211,9 +301,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`product-form__input ${
-                  errors.name ? "product-form__input--error" : ""
-                }`}
+                className={`product-form__input ${errors.name ? "product-form__input--error" : ""
+                  }`}
                 placeholder="Ej: Tomate Orgánico Chonto - Finca La Esperanza"
                 disabled={isSubmitting}
               />
@@ -234,9 +323,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                className={`product-form__textarea ${
-                  errors.description ? "product-form__textarea--error" : ""
-                }`}
+                className={`product-form__textarea ${errors.description ? "product-form__textarea--error" : ""
+                  }`}
                 placeholder="Ej: Tomates frescos, cultivados sin pesticidas. Perfectos para ensaladas."
                 rows={4}
                 disabled={isSubmitting}
@@ -258,9 +346,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 name="imageUrl"
                 value={formData.imageUrl}
                 onChange={handleInputChange}
-                className={`product-form__input ${
-                  errors.imageUrl ? "product-form__input--error" : ""
-                }`}
+                className={`product-form__input ${errors.imageUrl ? "product-form__input--error" : ""
+                  }`}
                 placeholder="https://ejemplo.com/imagen.jpg"
                 disabled={isSubmitting}
               />
@@ -268,76 +355,72 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 <span className="product-form__error">{errors.imageUrl}</span>
               )}
             </div>
-
             <div className="product-form__row">
-              <div className="product-form__field product-form__field--half">
-                <label htmlFor="price" className="product-form__label">
-                  Precio (COP) *
+
+              {/* ¿Cómo deseas vender este producto? */}
+              <div className="product-form__field">
+                <label htmlFor="saleUnit" className="product-form__label">
+                  ¿Cómo deseas vender este producto? *
                 </label>
-                <div className="product-form__input-group">
-                  <span className="product-form__input-prefix">$</span>
-                  <input
-                    type="number"
-                    id="price"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    className={`product-form__input ${
-                      errors.price ? "product-form__input--error" : ""
-                    }`}
-                    placeholder="5000"
-                    min="0"
-                    step="100"
-                    disabled={isSubmitting}
-                  />
-                  <span className="product-form__input-suffix">COP</span>
-                </div>
-                {errors.price && (
-                  <span className="product-form__error">{errors.price}</span>
+
+                <select
+                  id="saleUnit"
+                  name="saleUnit"
+                  value={formData.saleUnit}
+                  onChange={handleInputChange}
+                  className={`product-form__select ${errors.saleUnit ? "product-form__select--error" : ""}`}
+                  disabled={isSubmitting}
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="KILOGRAMO">Por kilogramo (1 kg)</option>
+                  <option value="LIBRA">Por libra (500 g)</option>
+                  <option value="GR_500">Por bolsa de 500 gramos</option>
+                  <option value="GR_250">Por bolsa de 250 gramos</option>
+                  <option value="DOCENA">Por docena</option>
+                  <option value="UNIDAD">Por unidad</option>
+                  <option value="MANOJO">Por manojo</option>
+                  <option value="BULTO_5KG">Por bulto (5 kg)</option>
+                  <option value="BULTO_10KG">Por bulto (10 kg)</option>
+                  <option value="CANASTILLA_20KG">Por canastilla (20 kg)</option>
+                  <option value="LITRO">Por litro</option>
+                  <option value="ML_500">Por 500 ml</option>
+                  <option value="ML_250">Por 250 ml</option>
+                </select>
+
+                {errors.saleUnit && (
+                  <span className="product-form__error">{errors.saleUnit}</span>
                 )}
+
+                <small className="product-form__hint">
+                  Elige la presentación exacta con la que quieres vender este producto.
+                </small>
               </div>
 
-              <div className="product-form__field product-form__field--half">
-                <label htmlFor="quantity" className="product-form__label">
-                  Cantidad a ofertar *
+
+              {/* CAMPO 5B: Precio por Unidad de Venta (¡CORRECCIÓN AQUÍ!) */}
+              <div className="product-form__field">
+                <label htmlFor="price" className="product-form__label">
+                  Precio por unidad de venta ($) *
                 </label>
                 <input
                   type="number"
-                  id="quantity"
-                  name="quantity"
-                  value={formData.quantity}
+                  id="price"
+                  name="price"
+                  value={formData.price}
                   onChange={handleInputChange}
-                  className={`product-form__input ${
-                    errors.quantity ? "product-form__input--error" : ""
-                  }`}
-                  placeholder="50"
-                  min="1"
+                  className={`product-form__input ${errors.price ? "product-form__input--error" : ""}`}
+                  placeholder="Ej: 5000"
+                  step="0.01"
+                  min="0.01"
                   disabled={isSubmitting}
                 />
-                {errors.quantity && (
-                  <span className="product-form__error">{errors.quantity}</span>
+                {errors.price && (
+                  <span className="product-form__error">{errors.price}</span>
                 )}
+                <small className="product-form__hint">
+                  Precio al público para la unidad que seleccionaste (ej: el precio de 1 kg).
+                </small>
               </div>
-            </div>
-
-            <div className="product-form__field">
-              <label htmlFor="unit" className="product-form__label">
-                Unidad de medida *
-              </label>
-              <select
-                id="unit"
-                name="unit"
-                value={formData.unit}
-                onChange={handleInputChange}
-                className="product-form__select"
-                disabled={isSubmitting}
-              >
-                {UNITS.map((unit) => (
-                  <option key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <div className="product-form__field">

@@ -1,0 +1,18 @@
+.inventory-modal {
+  max-width: 600px; /* Un poco más ancho para las 2 columnas */
+  width: 90%;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Responsivo: en móviles vuelve a 1 columna */
+@media (max-width: 600px) {
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -11,6 +11,7 @@ import LoginPage from "./pages/Login";
 import ProductDetail from "./pages/ProductDetail";
 import RegisterPage from "./pages/Register";
 import CatalogPage from "./pages/CatalogProducts";
+import InventoryPage from "./pages/inventory/Inventory";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { MainLayout } from "./layouts/MainLayout";
 import { AdminLayout } from "./layouts/AdminLayout";
@@ -117,6 +118,14 @@ const router = createBrowserRouter([
             element: (
               <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
                 <ClientOrdersTable />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "/product-management/inventory",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+                <InventoryPage />   {/* tu componente */}
               </ProtectedRoute>
             ),
           },
