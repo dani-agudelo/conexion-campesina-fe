@@ -190,21 +190,33 @@
   box-shadow: 0 6px 16px rgba(63, 212, 17, 0.4);
 }
 
+/* CORRECCIÓN: Tamaño fijo para botones de íconos */
 .client-orders__button--icon {
   background: linear-gradient(135deg, #3FD411, #2bb80a);
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(63, 212, 17, 0.3);
-  padding: 8px 12px;
-  display: flex;
+  padding: 0;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
   min-width: 40px;
   min-height: 40px;
+  max-width: 40px;
+  max-height: 40px;
 }
 
 .client-orders__button--icon:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(63, 212, 17, 0.4);
+}
+
+/* Asegurar que el contenido del botón (ícono o spinner) mantenga el tamaño */
+.client-orders__button--icon > * {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .client-orders__button--secondary {

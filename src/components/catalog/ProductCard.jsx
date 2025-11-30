@@ -8,28 +8,28 @@ import { useNavigate } from "react-router";
 import "./Products.css";
 
 const unitSymbols = {
-  KILOGRAMO: "Kg",
-  GRAMO: "g",
-  LITRO: "L",
-  MILILITRO: "mL",
-  TONELADA: "t",
-  LIBRA: "lb",
-  ARROBA: "arroba",
-  CARGA: "Carga",
-  BULTO: "Bulto",
-  SACO: "Saco",
-  CAJA: "Caja",
-  CANASTA: "Canasta",
-  ATADO: "Atado",
-  MANOJO: "Manojo",
-  RACIMO: "Racimo",
-  UNIDAD: "Unidad",
-  DOCENA: "Docena",
-  MEDIA_DOCENA: "½ Docena",
-  PAR: "Par",
-  CUARTILLA: "Cuartilla",
-  BOTELLA: "Botella",
-};
+  KILOGRAMO: 'kg',
+  GRAMO: 'g',
+  LITRO: 'L',
+  MILILITRO: 'mL',
+  TONELADA: 't',
+  LIBRA: 'lb',
+  ARROBA: 'arroba',
+  CARGA: 'Carga',
+  BULTO: 'Bulto',
+  SACO: 'Saco',
+  CAJA: 'Caja',
+  CANASTA: 'Canasta',
+  ATADO: 'Atado',
+  MANOJO: 'Manojo',
+  RACIMO: 'Racimo',
+  UNIDAD: 'Unidad',
+  DOCENA: 'Docena',
+  MEDIA_DOCENA: '½ Docena',
+  PAR: 'Par',
+  CUARTILLA: 'Cuartilla',
+  BOTELLA: 'Botella',
+}
 
 const ProductCard = ({ product }) => {
   const [showQuantityModal, setShowQuantityModal] = useState(false);
@@ -53,7 +53,8 @@ const ProductCard = ({ product }) => {
     [product, addItem]
   );
 
-  const handleOpenModal = useCallback(() => {
+  const handleOpenModal = useCallback((e) => {
+    e.stopPropagation();
     setShowQuantityModal(true);
   }, []);
 
@@ -77,14 +78,24 @@ const ProductCard = ({ product }) => {
 
       <div className="product-info">
         <h2>{product.name}</h2>
-        <p>{product.description}</p>
 
         {producer && (
           <p className="producer">
-            Vendido por:{" "}
-            <span className="producer-link">{producer.fullName}</span>
+            Vendido por:{' '}
+            <span className="producer-link">
+              {producer.fullName}
+            </span>
           </p>
         )}
+        
+        <p className="description">{product.description}</p>
+
+        <div className="price">
+          ${product.price}
+          <span className="unit">
+            {' '}/{unitSymbols[product.unit] ?? product.unit ?? ''}
+          </span>
+        </div>
 
         <button className="add-btn" onClick={handleOpenModal}>
           <AddToCartIcon /> Agregar al Carrito
