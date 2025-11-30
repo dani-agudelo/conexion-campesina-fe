@@ -15,8 +15,10 @@ import {
   useShippingByOrder,
   useCreateShippingMutation,
 } from "../../../hooks/query/useShipping";
+import { useCancelOrderMutation } from "../../../hooks/query/useCancelOrder";
 import { showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import { getDocumentShipping } from "../../../services/shippingService";
+import Swal from "sweetalert2";
 
 const ordersPerPage = 6;
 
@@ -115,6 +117,7 @@ const ClientOrdersTable = () => {
   };
 
   const createShipping = useCreateShippingMutation();
+  const cancelOrderMutation = useCancelOrderMutation();
 
   const handleDownload = async (orderId) => {
     setShippingLoading((prev) => ({ ...prev, [orderId]: "downloading" }));
@@ -233,8 +236,47 @@ const ClientOrdersTable = () => {
                               type="button"
                               className="client-orders__button client-orders__button--icon"
                               onClick={() => {
-                                console.info("Cancelar pedido:", order.id);
+                                Swal.fire({
+                                  title: '¿Cancelar pedido?',
+                                  text: 'Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar este pedido?',
+                                  icon: 'warning',
+                                  showCancelButton: true,
+                                  confirmButtonColor: '#d33',
+                                  cancelButtonColor: '#3085d6',
+                                  confirmButtonText: 'Sí, cancelar',
+                                  cancelButtonText: 'No, mantener',
+                                  reverseButtons: true,
+                                }).then((result) => {
+                                  if (result.isConfirmed) {
+                                    cancelOrderMutation.mutate(order.id, {
+                                      onSuccess: () => {
+                                        showSuccessAlert('Pedido cancelado correctamente');
+                                      },
+                                      onError: (error) => {
+                                        let errorMessage = 'No se pudo cancelar el pedido. Por favor intenta nuevamente.';
+                                        
+                                        try {
+                                          const errorData = JSON.parse(error.message);
+                                          if (errorData && errorData.message) {
+                                            if (Array.isArray(errorData.message)) {
+                                              errorMessage = errorData.message.join('; ');
+                                            } else if (typeof errorData.message === 'string') {
+                                              errorMessage = errorData.message;
+                                            }
+                                          }
+                                        } catch {
+                                          if (error.message && typeof error.message === 'string') {
+                                            errorMessage = error.message;
+                                          }
+                                        }
+                                        
+                                        showErrorAlert(errorMessage);
+                                      },
+                                    });
+                                  }
+                                });
                               }}
+                              disabled={cancelOrderMutation.isPending}
                               aria-label="Cancelar pedido"
                               title="Cancelar pedido"
                             >
