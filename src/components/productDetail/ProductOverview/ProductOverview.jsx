@@ -1,5 +1,6 @@
 import { ShoppingCart, Star, StarHalf } from "lucide-react";
 import { useState, useCallback } from "react";
+import Swal from "sweetalert2";
 import "./ProductOverview.css";
 import { useCart } from "../../../state/cart";
 import QuantityModal from "../../catalog/QuantityModal";
@@ -28,6 +29,20 @@ const ProductOverview = ({ product, summary }) => {
   const handleAddToCart = useCallback(
     (quantity) => {
       addItem(product, quantity);
+      
+      Swal.fire({
+        icon: 'success',
+        title: '¡Producto agregado!',
+        text: `${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} de ${product.name} ${quantity === 1 ? 'ha sido' : 'han sido'} agregada${quantity === 1 ? '' : 's'} al carrito`,
+        confirmButtonColor: '#3fd411',
+        confirmButtonText: 'Continuar',
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: true,
+      });
+      
+      // Cerrar el modal después de agregar
+      setShowQuantityModal(false);
     },
     [product, addItem]
   );
