@@ -53,13 +53,41 @@
 }
 
 
-.client-orders__table th:nth-child(1) { width: 13%; } /* ID PEDIDO */
-.client-orders__table th:nth-child(2) { width: 11%; } /* FECHA */
-.client-orders__table th:nth-child(3) { width: 12%; } /* ESTADO */
-.client-orders__table th:nth-child(4) { width: 10%; } /* TOTAL */
-.client-orders__table th:nth-child(5) { width: 10%; } /* ITEMS */
-.client-orders__table th:nth-child(6) { width: 22%; } /* DIRECCIÓN */
-.client-orders__table th:nth-child(7) { width: 22%; } /* ACCIONES - Aumentado */
+.client-orders__table th:nth-child(1) {
+  width: 13%;
+}
+
+/* ID PEDIDO */
+.client-orders__table th:nth-child(2) {
+  width: 11%;
+}
+
+/* FECHA */
+.client-orders__table th:nth-child(3) {
+  width: 12%;
+}
+
+/* ESTADO */
+.client-orders__table th:nth-child(4) {
+  width: 10%;
+}
+
+/* TOTAL */
+.client-orders__table th:nth-child(5) {
+  width: 10%;
+}
+
+/* ITEMS */
+.client-orders__table th:nth-child(6) {
+  width: 22%;
+}
+
+/* DIRECCIÓN */
+.client-orders__table th:nth-child(7) {
+  width: 22%;
+}
+
+/* ACCIONES - Aumentado */
 
 .client-orders__table thead {
   background: linear-gradient(135deg, #e8f5e8, #d4edda);
@@ -191,14 +219,22 @@
   box-shadow: 0 6px 16px rgba(63, 212, 17, 0.4);
 }
 
+/* * CORRECCIÓN: Definimos un tamaño fijo (40px x 40px) y quitamos el padding 
+ * para asegurar que el botón sea un cuadrado perfecto y no se estire la fila.
+ */
 .client-orders__button--icon {
   background: linear-gradient(135deg, #3FD411, #2bb80a);
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(63, 212, 17, 0.3);
-  padding: 8px 12px;
+  padding: 0;
+  /* <-- Cambio 1: Eliminamos el padding para usar dimensiones fijas */
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  /* <-- Cambio 2: Fija el ancho */
+  height: 40px;
+  /* <-- Cambio 3: Fija la altura */
   min-width: 40px;
   min-height: 40px;
 }
