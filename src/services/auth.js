@@ -31,3 +31,8 @@ export const register = async (registerDto) => {
 export const getUser = async () => {
   return await fetcher('auth/verify')
 }
+
+export const getUserById = async (userId) => {
+  return await fetcher(`auth/userinfo/${userId}`);
+}
+

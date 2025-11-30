@@ -1,0 +1,34 @@
+/* ===== CONTENEDOR DE PÁGINA ===== */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.catalog-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.catalog-page__header {
+  flex-shrink: 0;
+  padding: 40px 32px 0 32px;
+  box-sizing: border-box;
+}
+
+.catalog-page__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 32px 40px 32px;
+  box-sizing: border-box;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 0.5rem;
+  }
+}

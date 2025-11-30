@@ -85,7 +85,7 @@ const QuantityModal = ({ isOpen, onClose, onConfirm, productName, unit }) => {
         </div>
       </div>
     </div>,
-    document.body
+    document.body 
   );
 };
 
