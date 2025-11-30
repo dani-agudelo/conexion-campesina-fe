@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./OrdersTable.css";
 import { useProducerOrdersQuery } from "../../../hooks/query/useProducerOrders";
 import { Spinner } from "../../ui/spinner/Spinner";
+import OrderDetailsModal from "../../orders/OrderDetailsModal";
 
 const ordersPerPage = 5;
 
@@ -31,6 +32,8 @@ const resolveClientName = (order) =>
 const OrdersTable = () => {
   const { data: paidOrders = [], isPending, isError, error } = useProducerOrdersQuery();
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const totalPages = useMemo(
     () => Math.ceil(paidOrders.length / ordersPerPage),
@@ -143,7 +146,8 @@ const OrdersTable = () => {
                           type="button"
                           className="producer-orders__button producer-orders__button--ghost"
                           onClick={() => {
-                            console.info("Ver detalles del pedido:", order.id);
+                            setSelectedOrder(order);
+                            setIsDetailsModalOpen(true);
                           }}
                           aria-label="Ver detalles del pedido"
                         >
@@ -201,6 +205,15 @@ const OrdersTable = () => {
           </footer>
         </>
       )}
+
+      <OrderDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        order={selectedOrder}
+      />
     </section>
   );
 };

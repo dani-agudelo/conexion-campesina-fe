@@ -10,6 +10,7 @@ import {
   FilePlusIcon,
   FileTextIcon
 } from "../../icons";
+import OrderDetailsModal from "../../orders/OrderDetailsModal";
 import {
   useShippingByOrder,
   useCreateShippingMutation,
@@ -64,6 +65,8 @@ const ClientOrdersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [shippingLoading, setShippingLoading] = useState({});
   const shippingDocsRef = useRef({});
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const totalPages = useMemo(
     () => Math.ceil(orders.length / ordersPerPage),
@@ -125,7 +128,7 @@ const ClientOrdersTable = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       showSuccessAlert("Comprobante descargado correctamente");
-    } catch (error) {
+    } catch {
       showErrorAlert("No se pudo descargar el comprobante");
     } finally {
       setShippingLoading((prev) => ({ ...prev, [orderId]: null }));
@@ -217,10 +220,8 @@ const ClientOrdersTable = () => {
                             type="button"
                             className="client-orders__button client-orders__button--icon"
                             onClick={() => {
-                              console.info(
-                                "Ver detalles del pedido:",
-                                order.id
-                              );
+                              setSelectedOrder(order);
+                              setIsDetailsModalOpen(true);
                             }}
                             aria-label="Ver detalles"
                             title="Ver detalles"
@@ -386,6 +387,15 @@ const ClientOrdersTable = () => {
           </footer>
         </>
       )}
+
+      <OrderDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        order={selectedOrder}
+      />
     </section>
   );
 };
