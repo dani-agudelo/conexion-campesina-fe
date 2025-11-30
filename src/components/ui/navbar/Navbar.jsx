@@ -7,6 +7,7 @@ import { useCart } from "../../../state/cart";
 import { CartModal } from "../../cart";
 import { UserRole } from "../../../types/enums";
 import { MAIN_ROUTES } from "../../../constants/pages/pages";
+import NotificationsBell from "../notifications/NotificationsBell";
 
 const Navbar = () => {
     const clearUser = useAuth((state) => state.clearUser);
@@ -53,6 +54,10 @@ const Navbar = () => {
                             <span className="cart-badge">{totalItems}</span>
                         )}
                     </div>
+                )}
+
+                {currentUser.role === UserRole.PRODUCER && (
+                    <NotificationsBell />
                 )}
 
                 <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
