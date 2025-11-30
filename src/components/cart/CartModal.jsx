@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { useCart } from '../../state/cart';
 import { createOrder } from '../../services/orderService';
 import './CartModal.css';
 
 const CartModal = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
   const items = useCart((state) => state.items);
   const updateQuantity = useCart((state) => state.updateQuantity);
   const removeItem = useCart((state) => state.removeItem);
   const clearCart = useCart((state) => state.clearCart);
   
-  const [address, setAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -30,11 +27,6 @@ const CartModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleCheckout = async () => {
-    if (!address.trim()) {
-      setErrorMessage('Por favor ingresa una dirección de entrega');
-      return;
-    }
-
     if (items.length === 0) {
       setErrorMessage('El carrito está vacío');
       return;
@@ -45,40 +37,38 @@ const CartModal = ({ isOpen, onClose }) => {
 
     try {
       const orderData = {
-        address: address.trim(),
         orderDetails: items.map((item) => ({
           productOfferId: item.productOfferId,
           quantity: item.quantity,
-          price: item.price,
         })),
       };
 
-      await createOrder(orderData);
-      
+      const response = await createOrder(orderData);
+
+      const paymentUrl = response.paymentSession?.url;
+
+      if (!paymentUrl) {
+          throw new Error("El servicio de órdenes no devolvió la URL de pago.");
+      }
+
       clearCart();
-      setAddress('');
       onClose();
-      
-      Swal.fire({
-        icon: 'success',
-        title: '¡Orden creada exitosamente!',
-        text: 'Redirigiendo al catálogo...',
-        confirmButtonColor: '#4caf50',
-        confirmButtonText: 'Continuar',
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: true,
-        allowOutsideClick: false,
-        customClass: {
-          popup: 'swal-success-custom',
-          confirmButton: 'swal-confirm-button-custom'
-        }
-      }).then(() => {
-        navigate('/catalog');
-      });
+
+      window.location.href = paymentUrl;
+
     } catch (error) {
       console.error('Error al crear la orden:', error);
       setErrorMessage('Error al crear la orden. Por favor intenta nuevamente.');
+      const msg = error.message.includes('URL de pago') 
+        ? 'Error en la pasarela de pago. Intenta más tarde.'
+        : 'Error al crear la orden. Por favor intenta nuevamente.';
+        
+      Swal.fire({
+          icon: 'error',
+          title: 'Error de Compra',
+          text: msg,
+          confirmButtonColor: '#d33'
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -146,22 +136,9 @@ const CartModal = ({ isOpen, onClose }) => {
                     <div className="cart-total">
                       <h3>Total: ${totalPrice.toLocaleString()}</h3>
                     </div>
-                    <div className="address-input">
-                      <label htmlFor="address">Dirección de entrega:</label>
-                      <textarea
-                        id="address"
-                        value={address}
-                        onChange={(e) => {
-                          setAddress(e.target.value);
-                          setErrorMessage('');
-                        }}
-                        placeholder="Ingresa la dirección de entrega completa"
-                        rows="3"
-                      />
-                      {errorMessage && (
-                        <p className="error-message">{errorMessage}</p>
-                      )}
-                    </div>
+                    {errorMessage && (
+                      <p className="error-message">{errorMessage}</p>
+                    )}
                     <button
                       className="checkout-btn"
                       onClick={handleCheckout}

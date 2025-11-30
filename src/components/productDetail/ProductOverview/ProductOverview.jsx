@@ -1,5 +1,6 @@
 import { ShoppingCart, Star, StarHalf } from "lucide-react";
 import { useState, useCallback } from "react";
+import Swal from "sweetalert2";
 import "./ProductOverview.css";
 import { useCart } from "../../../state/cart";
 import QuantityModal from "../../catalog/QuantityModal";
@@ -28,6 +29,20 @@ const ProductOverview = ({ product, summary }) => {
   const handleAddToCart = useCallback(
     (quantity) => {
       addItem(product, quantity);
+      
+      Swal.fire({
+        icon: 'success',
+        title: '¡Producto agregado!',
+        text: `${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} de ${product.name} ${quantity === 1 ? 'ha sido' : 'han sido'} agregada${quantity === 1 ? '' : 's'} al carrito`,
+        confirmButtonColor: '#3fd411',
+        confirmButtonText: 'Continuar',
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: true,
+      });
+      
+      // Cerrar el modal después de agregar
+      setShowQuantityModal(false);
     },
     [product, addItem]
   );
@@ -55,7 +70,7 @@ const ProductOverview = ({ product, summary }) => {
         <h1 className="product-title">{product.name}</h1>
 
         <div className="seller-info">
-          <span className="seller-label">Sold by </span>
+          <span className="seller-label">Vendido por </span>
           <span className="seller-name">
             {product.producerName || "Productor desconocido"}
           </span>
@@ -66,7 +81,10 @@ const ProductOverview = ({ product, summary }) => {
             {renderStars(summary?.averageRating || 0)}
           </div>
           <span className="review-count">
-            ({summary?.totalReviews || 0} reviews)
+            {(() => {
+              const total = summary?.totalReviews || 0;
+              return `(${total} reseñ${total === 1 ? 'a' : 'as'})`;
+            })()}
           </span>
         </div>
 
@@ -77,7 +95,7 @@ const ProductOverview = ({ product, summary }) => {
 
         <button className="add-to-cart-btn" onClick={handleOpenModal}>
           <ShoppingCart size={20} />
-          <span>Add to Cart</span>
+          <span>Añadir al carrito</span>
         </button>
         <QuantityModal
           isOpen={showQuantityModal}

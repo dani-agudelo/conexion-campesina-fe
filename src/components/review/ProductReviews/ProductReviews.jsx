@@ -1,10 +1,13 @@
 import "./ProductReviews.css";
 import { Star, Edit, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useUserQuery } from "../../../hooks/query/useUserQuery.js";
 import { useDeleteReviewMutation } from "../../../hooks/query/useReview";
+import ReviewModal from "../ReviewModal/ReviewModal";
 import Swal from "sweetalert2";
 
 const ProductReviews = ({ reviews, summary, onEditReview }) => {
+  const [editingReview, setEditingReview] = useState(null);
   const { data: { user: currentUser } = {} } = useUserQuery();
   const deleteReview = useDeleteReviewMutation();
 
@@ -53,9 +56,29 @@ const ProductReviews = ({ reviews, summary, onEditReview }) => {
           },
         });
       } catch (error) {
+        // Formatear mensaje de error amigable
+        let errorMsg = "No se pudo eliminar la reseña. Intenta nuevamente.";
+        if (error?.message) {
+          if (Array.isArray(error.message)) {
+            errorMsg = error.message.map((msg) => {
+              // Traducción simple de mensajes comunes
+              if (msg.includes("not found")) {
+                return "La reseña no existe o ya fue eliminada.";
+              }
+              // Puedes agregar más traducciones aquí
+              return msg;
+            }).join("\n");
+          } else if (typeof error.message === "string") {
+            if (error.message.includes("not found")) {
+              errorMsg = "La reseña no existe o ya fue eliminada.";
+            } else {
+              errorMsg = error.message;
+            }
+          }
+        }
         Swal.fire({
           title: "Error",
-          text: "No se pudo eliminar la reseña. Intenta nuevamente.",
+          text: errorMsg,
           icon: "error",
           confirmButtonText: "Cerrar",
           customClass: {
@@ -92,8 +115,20 @@ const ProductReviews = ({ reviews, summary, onEditReview }) => {
 
   return (
     <div className="reviews-container">
+      {editingReview && (
+        <ReviewModal
+          productId={editingReview.productOfferId}
+          existingReview={editingReview}
+          open={!!editingReview}
+          onClose={() => setEditingReview(null)}
+          onReviewSubmitted={() => {
+            setEditingReview(null);
+            if (onEditReview) onEditReview();
+          }}
+        />
+      )}
       <div className="reviews-header">
-        <h2 className="section-title">Ratings & Reviews</h2>
+        <h2 className="section-title">Calificaciones y Reseñas</h2>
       </div>
 
       <div className="reviews-summary">
@@ -105,14 +140,17 @@ const ProductReviews = ({ reviews, summary, onEditReview }) => {
             {renderStars(Math.floor(summary?.averageRating || 0))}
           </div>
           <div className="total-reviews">
-            Based on {summary?.totalReviews || 0} reviews
+            {(() => {
+              const total = summary?.totalReviews || 0;
+              return `Basado en ${total} reseñ${total === 1 ? 'a' : 'as'}`;
+            })()}
           </div>
         </div>
 
         <div className="rating-bars">
           {distribution.map((item) => (
             <div key={item.stars} className="bar-row">
-              <span className="star-label">{item.stars} star</span>
+              <span className="star-label">{item.stars} estrella{item.stars > 1 ? 's' : ''}</span>
               <div className="bar-background">
                 <div
                   className="bar-fill"
@@ -156,7 +194,7 @@ const ProductReviews = ({ reviews, summary, onEditReview }) => {
                     <div className="action-buttons">
                       <button
                         className="action-btn edit-btn"
-                        onClick={() => onEditReview(review)}
+                        onClick={() => setEditingReview(review)}
                         title="Editar reseña"
                       >
                         <Edit size={16} />
@@ -183,7 +221,7 @@ const ProductReviews = ({ reviews, summary, onEditReview }) => {
       </div>
 
       {reviews && reviews.length > 2 && (
-        <button className="view-all-btn">View All Reviews</button>
+        <button className="view-all-btn">Ver todas las reseñas</button>
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import {
   XIcon,
   DownloadIcon,
   FilePlusIcon,
+  FileTextIcon
 } from "../../icons";
 import {
   useShippingByOrder,
@@ -315,6 +316,20 @@ const ClientOrdersTable = () => {
                               )}
                             </>
                           )}
+                          {/* Botón para ver recibo (Tu cambio recuperado) */}
+                          {order.status === "PAID" && (
+                            <button
+                              type="button"
+                              className="client-orders__button client-orders__button--secondary client-orders__button--icon"
+                              onClick={() => {
+                                if (order.orderReceipt?.receiptUrl) window.open(order.orderReceipt.receiptUrl, '_blank');
+                              }}
+                              aria-label="Ver recibo de pago"
+                              title="Ver recibo de pago"
+                            >
+                              <FileTextIcon size={18} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -346,11 +361,10 @@ const ClientOrdersTable = () => {
                     <button
                       key={page}
                       type="button"
-                      className={`client-orders__page-button ${
-                        page === currentPage
+                      className={`client-orders__page-button ${page === currentPage
                           ? "client-orders__page-button--active"
                           : ""
-                      }`}
+                        }`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
