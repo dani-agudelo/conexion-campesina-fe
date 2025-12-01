@@ -19,3 +19,9 @@ export const retryPayment = async (orderId) => {
   return await fetcher(`orders/${orderId}/retry-payment`);
 };
 
+export const cancelOrder = async (orderId) => {
+  return await fetcher(`orders/${orderId}/cancel`, {
+    method: 'POST',
+  });
+};
+

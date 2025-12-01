@@ -10,9 +10,12 @@ import {
   FilePlusIcon,
   FileTextIcon,
 } from "../../icons";
+import OrderDetailsModal from "../../orders/OrderDetailsModal";
 import { useShippingByOrder } from "../../../hooks/query/useShipping";
+import { useCancelOrderMutation } from "../../../hooks/query/useCancelOrder";
 import { showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import { getDocumentShipping } from "../../../services/shippingService";
+import Swal from "sweetalert2";
 
 const ordersPerPage = 6;
 
@@ -61,6 +64,8 @@ const ClientOrdersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [shippingLoading, setShippingLoading] = useState({});
   const shippingDocsRef = useRef({});
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const totalPages = useMemo(
     () => Math.ceil(orders.length / ordersPerPage),
@@ -108,7 +113,7 @@ const ClientOrdersTable = () => {
     return `#CC-${(order?.id || "").slice(0, 6).toUpperCase()}`;
   };
 
-  // const createShipping = useCreateShippingMutation(); // Ya no se usa
+  const cancelOrderMutation = useCancelOrderMutation();
 
   const handleDownload = async (orderId) => {
     setShippingLoading((prev) => ({ ...prev, [orderId]: "downloading" }));
@@ -122,7 +127,7 @@ const ClientOrdersTable = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       showSuccessAlert("Comprobante descargado correctamente");
-    } catch (error) {
+    } catch {
       showErrorAlert("No se pudo descargar el comprobante");
     } finally {
       setShippingLoading((prev) => ({ ...prev, [orderId]: null }));
@@ -214,10 +219,8 @@ const ClientOrdersTable = () => {
                             type="button"
                             className="client-orders__button client-orders__button--icon"
                             onClick={() => {
-                              console.info(
-                                "Ver detalles del pedido:",
-                                order.id
-                              );
+                              setSelectedOrder(order);
+                              setIsDetailsModalOpen(true);
                             }}
                             aria-label="Ver detalles"
                             title="Ver detalles"
@@ -229,8 +232,47 @@ const ClientOrdersTable = () => {
                               type="button"
                               className="client-orders__button client-orders__button--icon"
                               onClick={() => {
-                                console.info("Cancelar pedido:", order.id);
+                                Swal.fire({
+                                  title: '¿Cancelar pedido?',
+                                  text: 'Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar este pedido?',
+                                  icon: 'warning',
+                                  showCancelButton: true,
+                                  confirmButtonColor: '#d33',
+                                  cancelButtonColor: '#3085d6',
+                                  confirmButtonText: 'Sí, cancelar',
+                                  cancelButtonText: 'No, mantener',
+                                  reverseButtons: true,
+                                }).then((result) => {
+                                  if (result.isConfirmed) {
+                                    cancelOrderMutation.mutate(order.id, {
+                                      onSuccess: () => {
+                                        showSuccessAlert('Pedido cancelado correctamente');
+                                      },
+                                      onError: (error) => {
+                                        let errorMessage = 'No se pudo cancelar el pedido. Por favor intenta nuevamente.';
+                                        
+                                        try {
+                                          const errorData = JSON.parse(error.message);
+                                          if (errorData && errorData.message) {
+                                            if (Array.isArray(errorData.message)) {
+                                              errorMessage = errorData.message.join('; ');
+                                            } else if (typeof errorData.message === 'string') {
+                                              errorMessage = errorData.message;
+                                            }
+                                          }
+                                        } catch {
+                                          if (error.message && typeof error.message === 'string') {
+                                            errorMessage = error.message;
+                                          }
+                                        }
+                                        
+                                        showErrorAlert(errorMessage);
+                                      },
+                                    });
+                                  }
+                                });
                               }}
+                              disabled={cancelOrderMutation.isPending}
                               aria-label="Cancelar pedido"
                               title="Cancelar pedido"
                             >
@@ -336,6 +378,15 @@ const ClientOrdersTable = () => {
           </footer>
         </>
       )}
+
+      <OrderDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        order={selectedOrder}
+      />
     </section>
   );
 };

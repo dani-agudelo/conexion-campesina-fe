@@ -5,10 +5,10 @@ import {
 } from "../../../hooks/query/useShipping";
 import { TruckIcon } from "../../icons";
 import Swal from "sweetalert2";
-// import { Spinner } from "../../ui/spinner/Spinner";
 import "./OrdersTable.css";
 import { useProducerOrdersQuery } from "../../../hooks/query/useProducerOrders";
 import { Spinner } from "../../ui/spinner/Spinner";
+import OrderDetailsModal from "../../orders/OrderDetailsModal";
 
 const ordersPerPage = 5;
 
@@ -42,6 +42,8 @@ const OrdersTable = () => {
     error,
   } = useProducerOrdersQuery();
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const totalPages = useMemo(
     () => Math.ceil(paidOrders.length / ordersPerPage),
@@ -155,9 +157,7 @@ const OrdersTable = () => {
                       <td className="producer-orders__total">
                         {formatCurrency(order.totalAmount)}
                       </td>
-                      <td>
-                        {order.totalItems ?? order.orderDetails?.length ?? "-"}
-                      </td>
+                      <td>{order.totalItems ?? order.orderDetails?.length ?? "-"}</td>
                       <td>
                         <div className="producer-orders__actions">
                           {/* Mostrar botón de procesar envío (camión) solo si NO existe comprobante de envío */}
@@ -197,22 +197,15 @@ const OrdersTable = () => {
                               aria-label="Procesar envío"
                               title="Procesar envío"
                             >
-                              {shippingLoading[order.id] === true ||
-                              createShipping.isPending ? (
-                               <TruckIcon size={18} />
-                              ) : (
-                                <TruckIcon size={18} />
-                              )}
+                              <TruckIcon size={18} />
                             </button>
                           ) : null}
                           <button
                             type="button"
                             className="producer-orders__button producer-orders__button--ghost"
                             onClick={() => {
-                              console.info(
-                                "Ver detalles del pedido:",
-                                order.id
-                              );
+                              setSelectedOrder(order);
+                              setIsDetailsModalOpen(true);
                             }}
                             aria-label="Ver detalles del pedido"
                           >
@@ -275,6 +268,15 @@ const OrdersTable = () => {
           </footer>
         </>
       )}
+
+      <OrderDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        order={selectedOrder}
+      />
     </section>
   );
 };
