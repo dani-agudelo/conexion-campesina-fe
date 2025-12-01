@@ -1,4 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  useShippingByOrder,
+  useCreateShippingMutation,
+} from "../../../hooks/query/useShipping";
+import { TruckIcon } from "../../icons";
+import Swal from "sweetalert2";
 import "./OrdersTable.css";
 import { useProducerOrdersQuery } from "../../../hooks/query/useProducerOrders";
 import { Spinner } from "../../ui/spinner/Spinner";
@@ -26,11 +32,15 @@ const formatDate = (value) => {
   });
 };
 
-const resolveClientName = (order) =>
-  order?.clientName || "Cliente";
+const resolveClientName = (order) => order?.clientName || "Cliente";
 
 const OrdersTable = () => {
-  const { data: paidOrders = [], isPending, isError, error } = useProducerOrdersQuery();
+  const {
+    data: paidOrders = [],
+    isPending,
+    isError,
+    error,
+  } = useProducerOrdersQuery();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -52,7 +62,23 @@ const OrdersTable = () => {
   }, [currentPage, totalPages]);
 
   const startIndex = (currentPage - 1) * ordersPerPage;
-  const paginatedOrders = paidOrders.slice(startIndex, startIndex + ordersPerPage);
+  const paginatedOrders = paidOrders.slice(
+    startIndex,
+    startIndex + ordersPerPage
+  );
+
+  // Obtener shipping para cada orden paginada (igual que en ClientOrdersTable)
+  const shippingQueries = [
+    useShippingByOrder(paginatedOrders[0]?.id),
+    useShippingByOrder(paginatedOrders[1]?.id),
+    useShippingByOrder(paginatedOrders[2]?.id),
+    useShippingByOrder(paginatedOrders[3]?.id),
+    useShippingByOrder(paginatedOrders[4]?.id),
+  ];
+
+  // Estado de loading para cada orden al crear comprobante
+  const [shippingLoading, setShippingLoading] = useState({});
+  const createShipping = useCreateShippingMutation();
 
   const showingFrom = paidOrders.length === 0 ? 0 : startIndex + 1;
   const showingTo = startIndex + paginatedOrders.length;
@@ -74,7 +100,7 @@ const OrdersTable = () => {
   if (isPending) {
     return (
       <div className="producer-orders__loader">
-        <Spinner />
+        <Spinner size={18} />
       </div>
     );
   }
@@ -119,44 +145,77 @@ const OrdersTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedOrders.map((order, index) => (
-                  <tr key={order.id}>
-                    <td className="producer-orders__id">
-                      {buildOrderCode(order, index)}
-                    </td>
-                    <td>{resolveClientName(order)}</td>
-                    <td>{formatDate(order.orderDate || order.createdAt)}</td>
-                    <td className="producer-orders__total">
-                      {formatCurrency(order.totalAmount)}
-                    </td>
-                    <td>{order.totalItems ?? order.orderDetails?.length ?? "-"}</td>
-                    <td>
-                      <div className="producer-orders__actions">
-                        <button
-                          type="button"
-                          className="producer-orders__button producer-orders__button--primary"
-                          onClick={() => {
-                            // TODO: Implementar flujo de procesamiento
-                            console.info("Procesar envío:", order.id);
-                          }}
-                        >
-                          Procesar envío
-                        </button>
-                        <button
-                          type="button"
-                          className="producer-orders__button producer-orders__button--ghost"
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            setIsDetailsModalOpen(true);
-                          }}
-                          aria-label="Ver detalles del pedido"
-                        >
-                          Ver
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {paginatedOrders.map((order, index) => {
+                  const { data: shipping } = shippingQueries[index] || {};
+                  return (
+                    <tr key={order.id}>
+                      <td className="producer-orders__id">
+                        {buildOrderCode(order, index)}
+                      </td>
+                      <td>{resolveClientName(order)}</td>
+                      <td>{formatDate(order.orderDate || order.createdAt)}</td>
+                      <td className="producer-orders__total">
+                        {formatCurrency(order.totalAmount)}
+                      </td>
+                      <td>{order.totalItems ?? order.orderDetails?.length ?? "-"}</td>
+                      <td>
+                        <div className="producer-orders__actions">
+                          {/* Mostrar botón de procesar envío (camión) solo si NO existe comprobante de envío */}
+                          {!shipping || !shipping.id ? (
+                            <button
+                              type="button"
+                              className="producer-orders__button producer-orders__button--primary"
+                              disabled={
+                                shippingLoading[order.id] === true ||
+                                createShipping.isPending
+                              }
+                              onClick={async () => {
+                                setShippingLoading((prev) => ({
+                                  ...prev,
+                                  [order.id]: true,
+                                }));
+                                createShipping.mutate(order.id, {
+                                  onSuccess: () => {
+                                    Swal.fire({
+                                      title: "¡Comprobante generado!",
+                                      text: "El comprobante de envío se creó correctamente.",
+                                      icon: "success",
+                                      confirmButtonText: "Cerrar",
+                                    });
+                                  },
+                                  onError: () => {
+                                    // Opcional: mostrar feedback de error
+                                  },
+                                  onSettled: () => {
+                                    setShippingLoading((prev) => ({
+                                      ...prev,
+                                      [order.id]: false,
+                                    }));
+                                  },
+                                });
+                              }}
+                              aria-label="Procesar envío"
+                              title="Procesar envío"
+                            >
+                              <TruckIcon size={18} />
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            className="producer-orders__button producer-orders__button--ghost"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setIsDetailsModalOpen(true);
+                            }}
+                            aria-label="Ver detalles del pedido"
+                          >
+                            Ver
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -170,7 +229,9 @@ const OrdersTable = () => {
                 <button
                   type="button"
                   className="producer-orders__page-button"
-                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  onClick={() =>
+                    setCurrentPage((page) => Math.max(1, page - 1))
+                  }
                   disabled={currentPage === 1}
                 >
                   Anterior
@@ -182,7 +243,9 @@ const OrdersTable = () => {
                       key={page}
                       type="button"
                       className={`producer-orders__page-button ${
-                        page === currentPage ? "producer-orders__page-button--active" : ""
+                        page === currentPage
+                          ? "producer-orders__page-button--active"
+                          : ""
                       }`}
                       onClick={() => setCurrentPage(page)}
                     >
@@ -219,5 +282,3 @@ const OrdersTable = () => {
 };
 
 export default OrdersTable;
-
-

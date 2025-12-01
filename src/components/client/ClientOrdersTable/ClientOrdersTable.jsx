@@ -8,13 +8,10 @@ import {
   XIcon,
   DownloadIcon,
   FilePlusIcon,
-  FileTextIcon
+  FileTextIcon,
 } from "../../icons";
 import OrderDetailsModal from "../../orders/OrderDetailsModal";
-import {
-  useShippingByOrder,
-  useCreateShippingMutation,
-} from "../../../hooks/query/useShipping";
+import { useShippingByOrder } from "../../../hooks/query/useShipping";
 import { useCancelOrderMutation } from "../../../hooks/query/useCancelOrder";
 import { showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import { getDocumentShipping } from "../../../services/shippingService";
@@ -116,7 +113,6 @@ const ClientOrdersTable = () => {
     return `#CC-${(order?.id || "").slice(0, 6).toUpperCase()}`;
   };
 
-  const createShipping = useCreateShippingMutation();
   const cancelOrderMutation = useCancelOrderMutation();
 
   const handleDownload = async (orderId) => {
@@ -141,7 +137,7 @@ const ClientOrdersTable = () => {
   if (isPending) {
     return (
       <div className="client-orders__loader">
-        <Spinner />
+        <Spinner size={18}/>
       </div>
     );
   }
@@ -283,89 +279,41 @@ const ClientOrdersTable = () => {
                               <XIcon size={18} />
                             </button>
                           )}
-                          {/* Botones de comprobante de envío - disponibles para pedidos PAID, DELIVERED o PENDING (prueba) */}
-                          {(order.status === "PAID" || order.status === "DELIVERED" || order.status === "PENDING") && (
-                            <>
-                              {loadingShipping ? (
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--icon"
-                                  disabled
-                                  aria-label="Cargando información de envío"
-                                  title="Cargando..."
-                                >
-                                  <Spinner size={18} />
-                                </button>
-                              ) : shipping && shipping.id ? (
-                                // SI EXISTE el comprobante - Mostrar botón de descarga
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--secondary client-orders__button--icon"
-                                  disabled={
-                                    shippingLoading[order.id] === "downloading"
-                                  }
-                                  onClick={() => handleDownload(order.id)}
-                                  aria-label="Descargar comprobante de envío"
-                                  title="Descargar comprobante de envío"
-                                >
-                                  {shippingLoading[order.id] === "downloading" ? (
-                                    <Spinner size={18} />
-                                  ) : (
-                                    <DownloadIcon size={18} />
-                                  )}
-                                </button>
+                          {/* Botón de descarga de comprobante de envío solo si existe */}
+                          {(order.status === "PAID" ||
+                            order.status === "DELIVERED" ||
+                            order.status === "PENDING") &&
+                          !loadingShipping &&
+                          shipping &&
+                          shipping.id ? (
+                            <button
+                              type="button"
+                              className="client-orders__button client-orders__button--secondary client-orders__button--icon"
+                              disabled={
+                                shippingLoading[order.id] === "downloading"
+                              }
+                              onClick={() => handleDownload(order.id)}
+                              aria-label="Descargar comprobante de envío"
+                              title="Descargar comprobante de envío"
+                            >
+                              {shippingLoading[order.id] === "downloading" ? (
+                                <Spinner size={18} />
                               ) : (
-                                // NO EXISTE el comprobante - Mostrar botón de generar
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--primary client-orders__button--icon"
-                                  disabled={
-                                    createShipping.isPending ||
-                                    shippingLoading[order.id] === "generating"
-                                  }
-                                  onClick={async () => {
-                                    setShippingLoading((prev) => ({
-                                      ...prev,
-                                      [order.id]: "generating",
-                                    }));
-                                    createShipping.mutate(order.id, {
-                                      onSuccess: () => {
-                                        showSuccessAlert(
-                                          "Comprobante de envío generado correctamente"
-                                        );
-                                      },
-                                      onError: () => {
-                                        showErrorAlert(
-                                          "No se pudo generar el comprobante de envío"
-                                        );
-                                      },
-                                      onSettled: () => {
-                                        setShippingLoading((prev) => ({
-                                          ...prev,
-                                          [order.id]: null,
-                                        }));
-                                      },
-                                    });
-                                  }}
-                                  aria-label="Generar comprobante de envío"
-                                  title="Generar comprobante de envío"
-                                >
-                                  {shippingLoading[order.id] === "generating" ? (
-                                    <Spinner size={18} />
-                                  ) : (
-                                    <FilePlusIcon size={18} />
-                                  )}
-                                </button>
+                                <DownloadIcon size={18} />
                               )}
-                            </>
-                          )}
+                            </button>
+                          ) : null}
                           {/* Botón para ver recibo (Tu cambio recuperado) */}
                           {order.status === "PAID" && (
                             <button
                               type="button"
                               className="client-orders__button client-orders__button--secondary client-orders__button--icon"
                               onClick={() => {
-                                if (order.orderReceipt?.receiptUrl) window.open(order.orderReceipt.receiptUrl, '_blank');
+                                if (order.orderReceipt?.receiptUrl)
+                                  window.open(
+                                    order.orderReceipt.receiptUrl,
+                                    "_blank"
+                                  );
                               }}
                               aria-label="Ver recibo de pago"
                               title="Ver recibo de pago"
@@ -404,10 +352,11 @@ const ClientOrdersTable = () => {
                     <button
                       key={page}
                       type="button"
-                      className={`client-orders__page-button ${page === currentPage
+                      className={`client-orders__page-button ${
+                        page === currentPage
                           ? "client-orders__page-button--active"
                           : ""
-                        }`}
+                      }`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
