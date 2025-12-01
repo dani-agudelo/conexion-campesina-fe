@@ -10,6 +10,7 @@ import {
   useDeleteProductMutation,
 } from "../../hooks/query/useProductProducer";
 import { showSuccessAlert, showConfirmDialog, showErrorAlert } from "../../utils/sweetAlert";
+import { useCreateInventoryMutation } from "../../hooks/query/useCreateInventory";
 
 const ProductsPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -26,6 +27,7 @@ const ProductsPage = () => {
   const createProductMutation = useCreateProductMutation();
   const updateProductMutation = useUpdateProductMutation();
   const deleteProductMutation = useDeleteProductMutation();
+  const createInventoryMutation = useCreateInventoryMutation();
 
   const products = data || [];
   const loading = isPending;
@@ -82,22 +84,28 @@ const ProductsPage = () => {
     }
   };
 
-  const handleInventoryFormSubmit = (inventoryData) => {
+  const handleInventoryFormSubmit = async (inventoryData) => {
     const payload = {
-      productOfferId: createdProductId,
+      productOfferId: inventoryData.productOfferId,
       available_quantity: inventoryData.quantity,
       unit: inventoryData.unit,
       minimum_threshold: inventoryData.minThreshold,
       maximum_capacity: inventoryData.maxCapacity
     };
 
-    console.log("Payload para inventario:", JSON.stringify(payload, null, 2));
-
-    showSuccessAlert("Producto creado (Inventario impreso en consola)");
+    try {
+      await createInventoryMutation.mutateAsync(payload);
+      showSuccessAlert("Inventario creado exitosamente");
+    } catch (error) {
+      console.error("Error al crear inventario:", error);
+      showErrorAlert("No se pudo crear el inventario");
+    }
 
     setShowInventoryForm(false);
     setCreatedProductId(null);
   };
+
+
 
   const handleCloseForm = () => {
     setShowForm(false);
@@ -255,6 +263,7 @@ const ProductsPage = () => {
 
       {showInventoryForm && (
         <InventoryForm
+          productOfferId={createdProductId}
           onSave={handleInventoryFormSubmit}
           onCancel={handleCloseInventoryForm}
         />

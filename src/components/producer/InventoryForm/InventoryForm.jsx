@@ -2,8 +2,9 @@ import "./InventoryForm.css";
 import { useState } from "react";
 import { UNITS } from "../../../types/enums";
 
-const InventoryForm = ({ onSave, onCancel }) => {
+const InventoryForm = ({ productOfferId, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
+    productOfferId: productOfferId, 
     quantity: "",
     unit: "",
     minThreshold: "",
@@ -42,6 +43,7 @@ const InventoryForm = ({ onSave, onCancel }) => {
     if (!validate()) return;
 
     onSave({
+      productOfferId: formData.productOfferId,
       quantity: Number(formData.quantity),
       unit: formData.unit,
       minThreshold: Number(formData.minThreshold),
