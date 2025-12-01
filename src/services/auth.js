@@ -16,7 +16,7 @@ export const login = async (loginDto) => {
 }
 
 export const register = async (registerDto) => {
-  const res = await fetch(`${API_URL}/auth/register`, {
+  return await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -24,8 +24,6 @@ export const register = async (registerDto) => {
     },
     body: JSON.stringify(registerDto)
   })
-
-  return await res.json()
 }
 
 export const getUser = async () => {
