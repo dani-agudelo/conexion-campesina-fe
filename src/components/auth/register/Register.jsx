@@ -10,9 +10,10 @@ const Register = () => {
 
   const mutation = useMutation({
     mutationFn: registerData => register(registerData),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.status && data.status !== 201) {
-        showErrorAlert(data.message);
+        const dataError = await data.json();
+        showErrorAlert(dataError.message);
         return;
       }
 
