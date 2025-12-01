@@ -8,14 +8,14 @@ import {
   XIcon,
   DownloadIcon,
   FilePlusIcon,
-  FileTextIcon
+  FileTextIcon,
 } from "../../icons";
-import {
-  useShippingByOrder,
-  useCreateShippingMutation,
-} from "../../../hooks/query/useShipping";
+import OrderDetailsModal from "../../orders/OrderDetailsModal";
+import { useShippingByOrder } from "../../../hooks/query/useShipping";
+import { useCancelOrderMutation } from "../../../hooks/query/useCancelOrder";
 import { showSuccessAlert, showErrorAlert } from "../../../utils/sweetAlert";
 import { getDocumentShipping } from "../../../services/shippingService";
+import Swal from "sweetalert2";
 
 const ordersPerPage = 6;
 
@@ -64,6 +64,8 @@ const ClientOrdersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [shippingLoading, setShippingLoading] = useState({});
   const shippingDocsRef = useRef({});
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const totalPages = useMemo(
     () => Math.ceil(orders.length / ordersPerPage),
@@ -111,7 +113,7 @@ const ClientOrdersTable = () => {
     return `#CC-${(order?.id || "").slice(0, 6).toUpperCase()}`;
   };
 
-  const createShipping = useCreateShippingMutation();
+  const cancelOrderMutation = useCancelOrderMutation();
 
   const handleDownload = async (orderId) => {
     setShippingLoading((prev) => ({ ...prev, [orderId]: "downloading" }));
@@ -125,7 +127,7 @@ const ClientOrdersTable = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       showSuccessAlert("Comprobante descargado correctamente");
-    } catch (error) {
+    } catch {
       showErrorAlert("No se pudo descargar el comprobante");
     } finally {
       setShippingLoading((prev) => ({ ...prev, [orderId]: null }));
@@ -135,7 +137,7 @@ const ClientOrdersTable = () => {
   if (isPending) {
     return (
       <div className="client-orders__loader">
-        <Spinner />
+        <Spinner size={18}/>
       </div>
     );
   }
@@ -217,10 +219,8 @@ const ClientOrdersTable = () => {
                             type="button"
                             className="client-orders__button client-orders__button--icon"
                             onClick={() => {
-                              console.info(
-                                "Ver detalles del pedido:",
-                                order.id
-                              );
+                              setSelectedOrder(order);
+                              setIsDetailsModalOpen(true);
                             }}
                             aria-label="Ver detalles"
                             title="Ver detalles"
@@ -232,97 +232,88 @@ const ClientOrdersTable = () => {
                               type="button"
                               className="client-orders__button client-orders__button--icon"
                               onClick={() => {
-                                console.info("Cancelar pedido:", order.id);
+                                Swal.fire({
+                                  title: '¿Cancelar pedido?',
+                                  text: 'Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar este pedido?',
+                                  icon: 'warning',
+                                  showCancelButton: true,
+                                  confirmButtonColor: '#d33',
+                                  cancelButtonColor: '#3085d6',
+                                  confirmButtonText: 'Sí, cancelar',
+                                  cancelButtonText: 'No, mantener',
+                                  reverseButtons: true,
+                                }).then((result) => {
+                                  if (result.isConfirmed) {
+                                    cancelOrderMutation.mutate(order.id, {
+                                      onSuccess: () => {
+                                        showSuccessAlert('Pedido cancelado correctamente');
+                                      },
+                                      onError: (error) => {
+                                        let errorMessage = 'No se pudo cancelar el pedido. Por favor intenta nuevamente.';
+                                        
+                                        try {
+                                          const errorData = JSON.parse(error.message);
+                                          if (errorData && errorData.message) {
+                                            if (Array.isArray(errorData.message)) {
+                                              errorMessage = errorData.message.join('; ');
+                                            } else if (typeof errorData.message === 'string') {
+                                              errorMessage = errorData.message;
+                                            }
+                                          }
+                                        } catch {
+                                          if (error.message && typeof error.message === 'string') {
+                                            errorMessage = error.message;
+                                          }
+                                        }
+                                        
+                                        showErrorAlert(errorMessage);
+                                      },
+                                    });
+                                  }
+                                });
                               }}
+                              disabled={cancelOrderMutation.isPending}
                               aria-label="Cancelar pedido"
                               title="Cancelar pedido"
                             >
                               <XIcon size={18} />
                             </button>
                           )}
-                          {/* Botones de comprobante de envío - disponibles para pedidos PAID, DELIVERED o PENDING (prueba) */}
-                          {(order.status === "PAID" || order.status === "DELIVERED" || order.status === "PENDING") && (
-                            <>
-                              {loadingShipping ? (
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--icon"
-                                  disabled
-                                  aria-label="Cargando información de envío"
-                                  title="Cargando..."
-                                >
-                                  <Spinner size={18} />
-                                </button>
-                              ) : shipping && shipping.id ? (
-                                // SI EXISTE el comprobante - Mostrar botón de descarga
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--secondary client-orders__button--icon"
-                                  disabled={
-                                    shippingLoading[order.id] === "downloading"
-                                  }
-                                  onClick={() => handleDownload(order.id)}
-                                  aria-label="Descargar comprobante de envío"
-                                  title="Descargar comprobante de envío"
-                                >
-                                  {shippingLoading[order.id] === "downloading" ? (
-                                    <Spinner size={18} />
-                                  ) : (
-                                    <DownloadIcon size={18} />
-                                  )}
-                                </button>
+                          {/* Botón de descarga de comprobante de envío solo si existe */}
+                          {(order.status === "PAID" ||
+                            order.status === "DELIVERED" ||
+                            order.status === "PENDING") &&
+                          !loadingShipping &&
+                          shipping &&
+                          shipping.id ? (
+                            <button
+                              type="button"
+                              className="client-orders__button client-orders__button--secondary client-orders__button--icon"
+                              disabled={
+                                shippingLoading[order.id] === "downloading"
+                              }
+                              onClick={() => handleDownload(order.id)}
+                              aria-label="Descargar comprobante de envío"
+                              title="Descargar comprobante de envío"
+                            >
+                              {shippingLoading[order.id] === "downloading" ? (
+                                <Spinner size={18} />
                               ) : (
-                                // NO EXISTE el comprobante - Mostrar botón de generar
-                                <button
-                                  type="button"
-                                  className="client-orders__button client-orders__button--primary client-orders__button--icon"
-                                  disabled={
-                                    createShipping.isPending ||
-                                    shippingLoading[order.id] === "generating"
-                                  }
-                                  onClick={async () => {
-                                    setShippingLoading((prev) => ({
-                                      ...prev,
-                                      [order.id]: "generating",
-                                    }));
-                                    createShipping.mutate(order.id, {
-                                      onSuccess: () => {
-                                        showSuccessAlert(
-                                          "Comprobante de envío generado correctamente"
-                                        );
-                                      },
-                                      onError: () => {
-                                        showErrorAlert(
-                                          "No se pudo generar el comprobante de envío"
-                                        );
-                                      },
-                                      onSettled: () => {
-                                        setShippingLoading((prev) => ({
-                                          ...prev,
-                                          [order.id]: null,
-                                        }));
-                                      },
-                                    });
-                                  }}
-                                  aria-label="Generar comprobante de envío"
-                                  title="Generar comprobante de envío"
-                                >
-                                  {shippingLoading[order.id] === "generating" ? (
-                                    <Spinner size={18} />
-                                  ) : (
-                                    <FilePlusIcon size={18} />
-                                  )}
-                                </button>
+                                <DownloadIcon size={18} />
                               )}
-                            </>
-                          )}
+                            </button>
+                          ) : null}
                           {/* Botón para ver recibo (Tu cambio recuperado) */}
                           {order.status === "PAID" && (
                             <button
                               type="button"
                               className="client-orders__button client-orders__button--secondary client-orders__button--icon"
                               onClick={() => {
-                                if (order.orderReceipt?.receiptUrl) window.open(order.orderReceipt.receiptUrl, '_blank');
+                                if (order.orderReceipt?.receiptUrl)
+                                  window.open(
+                                    order.orderReceipt.receiptUrl,
+                                    "_blank"
+                                  );
                               }}
                               aria-label="Ver recibo de pago"
                               title="Ver recibo de pago"
@@ -361,10 +352,11 @@ const ClientOrdersTable = () => {
                     <button
                       key={page}
                       type="button"
-                      className={`client-orders__page-button ${page === currentPage
+                      className={`client-orders__page-button ${
+                        page === currentPage
                           ? "client-orders__page-button--active"
                           : ""
-                        }`}
+                      }`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
@@ -386,6 +378,15 @@ const ClientOrdersTable = () => {
           </footer>
         </>
       )}
+
+      <OrderDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        order={selectedOrder}
+      />
     </section>
   );
 };

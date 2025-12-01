@@ -58,15 +58,35 @@ const CartModal = ({ isOpen, onClose }) => {
 
     } catch (error) {
       console.error('Error al crear la orden:', error);
-      setErrorMessage('Error al crear la orden. Por favor intenta nuevamente.');
-      const msg = error.message.includes('URL de pago') 
-        ? 'Error en la pasarela de pago. Intenta más tarde.'
-        : 'Error al crear la orden. Por favor intenta nuevamente.';
+      
+      let errorMessage = 'Error al crear la orden. Por favor intenta nuevamente.';
+      
+      try {
+        const errorData = JSON.parse(error.message);
+        
+        if (errorData && errorData.message) {
+          if (Array.isArray(errorData.message)) {
+            errorMessage = errorData.message.join('; ');
+          } else if (typeof errorData.message === 'string') {
+            errorMessage = errorData.message;
+          }
+        }
+      } catch {
+        if (error.message && typeof error.message === 'string') {
+          if (error.message.includes('URL de pago')) {
+            errorMessage = 'Error en la pasarela de pago. Intenta más tarde.';
+          } else {
+            errorMessage = error.message;
+          }
+        }
+      }
+      
+      setErrorMessage(errorMessage);
         
       Swal.fire({
           icon: 'error',
           title: 'Error de Compra',
-          text: msg,
+          text: errorMessage,
           confirmButtonColor: '#d33'
       });
     } finally {
