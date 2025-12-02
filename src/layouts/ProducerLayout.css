@@ -9,17 +9,17 @@
   flex: 1;
   background-color: #ffffff;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Cambiado de center a flex-start */
   padding: 0;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
+  width: 100%; /* Asegura que ocupe todo el ancho */
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .producer-layout__content {
-    padding: 24px 16px;
+    padding: 0;
   }
 }
-

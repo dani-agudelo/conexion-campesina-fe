@@ -8,21 +8,33 @@
 
 .product-list__table-container {
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .product-list__table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
   table-layout: fixed;
   display: table !important;
 }
 
-.product-list__table th:nth-child(1) { width: 28%; } /* PRODUCTO */
-.product-list__table th:nth-child(2) { width: 32%; } /* DESCRIPCIÓN */
-.product-list__table th:nth-child(3) { width: 10%; } /* PRECIO */
-.product-list__table th:nth-child(4) { width: 15%; } /* CANTIDAD */
-.product-list__table th:nth-child(5) { width: 15%; } /* ACCIONES */
+/* Ancho ajustado para cada columna - Total = 100% */
+.product-list__table th:nth-child(1) { width: 17%; } /* PRODUCTO */
+.product-list__table th:nth-child(2) { width: 22%; } /* DESCRIPCIÓN */
+.product-list__table th:nth-child(3) { width: 8%; }  /* PRECIO */
+.product-list__table th:nth-child(4) { width: 8%; }  /* CANTIDAD */
+.product-list__table th:nth-child(5) { width: 10%; } /* ESTADO */
+.product-list__table th:nth-child(6) { width: 11%; } /* DISPONIBILIDAD */
+.product-list__table th:nth-child(7) { width: 14%; } /* ACCIONES */
+
+/* Alinear las columnas numéricas y de estado al centro */
+.product-list__header-cell:nth-child(3),
+.product-list__header-cell:nth-child(4),
+.product-list__header-cell:nth-child(5),
+.product-list__header-cell:nth-child(6),
+.product-list__header-cell:nth-child(7) {
+  text-align: center;
+}
 
 .product-list__header {
   background: linear-gradient(135deg, #e8f5e8, #d4edda);
@@ -39,6 +51,14 @@
   letter-spacing: 0.5px;
   border-bottom: 2px solid #dee2e6;
   display: table-cell !important;
+}
+
+/* Alinear las columnas de precio, cantidad y disponibilidad al centro */
+.product-list__header-cell:nth-child(3),
+.product-list__header-cell:nth-child(4),
+.product-list__header-cell:nth-child(5),
+.product-list__header-cell:nth-child(6) {
+  text-align: center;
 }
 
 .product-list__body {
@@ -101,9 +121,23 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .product-list__table-container {
+    overflow-x: auto;
+  }
+  
   .product-list__table {
-    min-width: 600px;
+    min-width: 1000px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-list__table-container {
+    overflow-x: auto;
+  }
+  
+  .product-list__table {
+    min-width: 900px;
   }
   
   .product-list__header-cell {

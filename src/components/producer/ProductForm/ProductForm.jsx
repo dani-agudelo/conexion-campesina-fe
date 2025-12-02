@@ -9,11 +9,10 @@ const ProductForm = ({ product, onSave, onClose }) => {
     name: "",
     description: "",
     price: "",
-    quantity: "",
+    quantity: "1",
     unit: "KILOGRAMO",
     imageUrl: "",
     isAvailable: true,
-    saleUnit: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -28,14 +27,13 @@ const ProductForm = ({ product, onSave, onClose }) => {
         name: product.name || "",
         description: product.description || "",
         price: product.price || "",
+        quantity: product.quantity || "1",
         unit: product.unit || "KILOGRAMO",
         imageUrl: product.imageUrl || "",
         isAvailable: product.isAvailable ?? true,
-        saleUnit: product.saleUnit || "",  // ← FALTABA
       });
     }
   }, [product]);
-
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,7 +42,6 @@ const ProductForm = ({ product, onSave, onClose }) => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -67,22 +64,25 @@ const ProductForm = ({ product, onSave, onClose }) => {
     if (!formData.description.trim()) {
       newErrors.description = "La descripción es requerida";
     } else if (formData.description.length < 10) {
-      newErrors.description =
-        "La descripción debe tener al menos 10 caracteres";
+      newErrors.description = "La descripción debe tener al menos 10 caracteres";
     }
 
     if (!formData.price || formData.price <= 0) {
       newErrors.price = "El precio debe ser mayor a 0";
     }
 
+    if (!formData.quantity || formData.quantity <= 0) {
+      newErrors.quantity = "La cantidad debe ser mayor a 0";
+    }
+
+    if (!formData.unit) {
+      newErrors.unit = "Debes seleccionar una unidad";
+    }
+
     if (!formData.imageUrl.trim()) {
       newErrors.imageUrl = "El link de imagen es requerido";
     } else if (!isValidUrl(formData.imageUrl)) {
       newErrors.imageUrl = "Ingresa una URL válida";
-    }
-
-    if (!formData.saleUnit) {
-      newErrors.saleUnit = "Debes seleccionar la presentación de venta";
     }
 
     setErrors(newErrors);
@@ -108,107 +108,17 @@ const ProductForm = ({ product, onSave, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      let finalUnit = "GRAMO";
-      let finalQuantity = 1;
-
-      switch (formData.saleUnit) {
-
-        // --- TUS OPCIONES ACTUALES ---
-        case "KILOGRAMO":
-          finalUnit = "KILOGRAMO";
-          finalQuantity = 1;
-          break;
-
-        case "LIBRA":
-          finalUnit = "GRAMO";
-          finalQuantity = 500; // equivalente a media libra
-          break;
-
-        case "GR_500":
-          finalUnit = "GRAMO";
-          finalQuantity = 500;
-          break;
-
-        case "GR_250":
-          finalUnit = "GRAMO";
-          finalQuantity = 250;
-          break;
-
-
-        // --- NUEVAS OPCIONES PROPUESTAS ---
-
-        // 🍶 Litro
-        case "LITRO":
-          finalUnit = "LITRO";
-          finalQuantity = 1;
-          break;
-
-        // 🥤 Medio litro (500 ml)
-        case "ML_500":
-          finalUnit = "MILILITRO";
-          finalQuantity = 500;
-          break;
-
-        // 🥤 Cuarto de litro (250 ml)
-        case "ML_250":
-          finalUnit = "MILILITRO";
-          finalQuantity = 250;
-          break;
-
-        // 🥚 Docena
-        case "DOCENA":
-          finalUnit = "UNIDAD";
-          finalQuantity = 12;
-          break;
-
-        // 🥚 Unidad (para huevos, frutas grandes, etc.)
-        case "UNIDAD":
-          finalUnit = "UNIDAD";
-          finalQuantity = 1;
-          break;
-
-        // 🍌 Manojo / atado
-        case "MANOJO":
-          finalUnit = "UNIDAD";
-          finalQuantity = 1;
-          break;
-
-        // 🧅 Bulto de 5kg
-        case "BULTO_5KG":
-          finalUnit = "KILOGRAMO";
-          finalQuantity = 5;
-          break;
-
-        // 🧅 Bulto de 10kg
-        case "BULTO_10KG":
-          finalUnit = "KILOGRAMO";
-          finalQuantity = 10;
-          break;
-
-        // 🥬 Canastilla (usualmente 20kg)
-        case "CANASTILLA_20KG":
-          finalUnit = "KILOGRAMO";
-          finalQuantity = 20;
-          break;
-
-        default:
-          finalUnit = "GRAMO";
-          finalQuantity = 1;
-      }
-
-
       const productData = {
         productBaseId: formData.productBaseId,
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
-        unit: finalUnit,
-        quantity: finalQuantity,
+        unit: formData.unit,
+        quantity: parseFloat(formData.quantity),
         imageUrl: formData.imageUrl || undefined,
         isAvailable: formData.isAvailable,
       };
 
-      // Remover campos undefined
       Object.keys(productData).forEach(
         (key) => productData[key] === undefined && delete productData[key]
       );
@@ -226,6 +136,61 @@ const ProductForm = ({ product, onSave, onClose }) => {
       onClose();
     }
   };
+
+  // Función para obtener el nombre de la unidad
+  const getUnitLabel = (unit, quantity) => {
+    const unitLabels = {
+      KILOGRAMO: quantity > 1 ? 'kilogramos' : 'kilogramo',
+      GRAMO: quantity > 1 ? 'gramos' : 'gramo',
+      LITRO: quantity > 1 ? 'litros' : 'litro',
+      MILILITRO: quantity > 1 ? 'mililitros' : 'mililitro',
+      LIBRA: quantity > 1 ? 'libras' : 'libra',
+      UNIDAD: quantity > 1 ? 'unidades' : 'unidad',
+      DOCENA: quantity > 1 ? 'docenas' : 'docena',
+      MANOJO: quantity > 1 ? 'manojos' : 'manojo',
+      ATADO: quantity > 1 ? 'atados' : 'atado',
+      BULTO: quantity > 1 ? 'bultos' : 'bulto',
+      SACO: quantity > 1 ? 'sacos' : 'saco',
+      CAJA: quantity > 1 ? 'cajas' : 'caja',
+      CANASTA: quantity > 1 ? 'canastas' : 'canasta',
+    };
+    return unitLabels[unit] || unit.toLowerCase();
+  };
+
+  // Calcular cuántas ventas equivalen a 1kg de inventario
+  const calculateInventoryImpact = () => {
+    const qty = parseFloat(formData.quantity) || 0;
+    const unit = formData.unit;
+
+    let gramsPerSale = 0;
+
+    switch (unit) {
+      case 'KILOGRAMO':
+        gramsPerSale = qty * 1000;
+        break;
+      case 'GRAMO':
+        gramsPerSale = qty;
+        break;
+      case 'LIBRA':
+        gramsPerSale = qty * 500;
+        break;
+      case 'LITRO':
+        gramsPerSale = qty * 1000;
+        break;
+      case 'MILILITRO':
+        gramsPerSale = qty;
+        break;
+      default:
+        return null;
+    }
+
+    if (gramsPerSale === 0) return null;
+
+    const salesPerKilo = (1000 / gramsPerSale).toFixed(2);
+    return salesPerKilo;
+  };
+
+  const salesPerKilo = calculateInventoryImpact();
 
   return (
     <div className="product-form-overlay" onClick={handleClose}>
@@ -251,189 +216,204 @@ const ProductForm = ({ product, onSave, onClose }) => {
           </p>
 
           <form onSubmit={handleSubmit} className="product-form__form">
-            {/* CAMPO ACTUALIZADO: ProductBase selector */}
-            <div className="product-form__field">
-              <label htmlFor="productBaseId" className="product-form__label">
-                Tipo de Producto *
-              </label>
-              <select
-                id="productBaseId"
-                name="productBaseId"
-                value={formData.productBaseId}
-                onChange={handleInputChange}
-                className={`product-form__select ${errors.productBaseId ? "product-form__select--error" : ""
-                  }`}
-                disabled={isSubmitting || loadingBases}
-              >
-                <option value="">
-                  {loadingBases
-                    ? "Cargando productos..."
-                    : "Selecciona un producto"}
-                </option>
-                {productBases?.map((base) => (
-                  <option key={base.id} value={base.id}>
-                    {base.name} - {base.category}
-                  </option>
-                ))}
-              </select>
-              {errors.productBaseId && (
-                <span className="product-form__error">
-                  {errors.productBaseId}
-                </span>
-              )}
-              {errorBases && (
-                <span className="product-form__error">
-                  Error al cargar productos base
-                </span>
-              )}
-              <small className="product-form__hint">
-                Selecciona el tipo de producto que vas a ofrecer
-              </small>
-            </div>
+            {/* === SECCIÓN 1: INFORMACIÓN GENERAL === */}
+            <div className="product-form__section">
+              <div className="product-form__section-header">
+                <h3 className="product-form__section-title">Información General</h3>
+              </div>
 
-            <div className="product-form__field">
-              <label htmlFor="name" className="product-form__label">
-                Nombre de tu oferta *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className={`product-form__input ${errors.name ? "product-form__input--error" : ""
-                  }`}
-                placeholder="Ej: Tomate Orgánico Chonto - Finca La Esperanza"
-                disabled={isSubmitting}
-              />
-              {errors.name && (
-                <span className="product-form__error">{errors.name}</span>
-              )}
-              <small className="product-form__hint">
-                Dale un nombre único a tu oferta para diferenciarte
-              </small>
-            </div>
-
-            <div className="product-form__field">
-              <label htmlFor="description" className="product-form__label">
-                Descripción *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className={`product-form__textarea ${errors.description ? "product-form__textarea--error" : ""
-                  }`}
-                placeholder="Ej: Tomates frescos, cultivados sin pesticidas. Perfectos para ensaladas."
-                rows={4}
-                disabled={isSubmitting}
-              />
-              {errors.description && (
-                <span className="product-form__error">
-                  {errors.description}
-                </span>
-              )}
-            </div>
-
-            <div className="product-form__field">
-              <label htmlFor="imageUrl" className="product-form__label">
-                Link de imagen *
-              </label>
-              <input
-                type="url"
-                id="imageUrl"
-                name="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleInputChange}
-                className={`product-form__input ${errors.imageUrl ? "product-form__input--error" : ""
-                  }`}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                disabled={isSubmitting}
-              />
-              {errors.imageUrl && (
-                <span className="product-form__error">{errors.imageUrl}</span>
-              )}
-            </div>
-            <div className="product-form__row">
-
-              {/* ¿Cómo deseas vender este producto? */}
               <div className="product-form__field">
-                <label htmlFor="saleUnit" className="product-form__label">
-                  ¿Cómo deseas vender este producto? *
+                <label htmlFor="productBaseId" className="product-form__label">
+                  Tipo de Producto *
                 </label>
-
                 <select
-                  id="saleUnit"
-                  name="saleUnit"
-                  value={formData.saleUnit}
+                  id="productBaseId"
+                  name="productBaseId"
+                  value={formData.productBaseId}
                   onChange={handleInputChange}
-                  className={`product-form__select ${errors.saleUnit ? "product-form__select--error" : ""}`}
-                  disabled={isSubmitting}
+                  className={`product-form__select ${errors.productBaseId ? "product-form__select--error" : ""}`}
+                  disabled={isSubmitting || loadingBases}
                 >
-                  <option value="">Selecciona una opción</option>
-                  <option value="KILOGRAMO">Por kilogramo (1 kg)</option>
-                  <option value="LIBRA">Por libra (500 g)</option>
-                  <option value="GR_500">Por bolsa de 500 gramos</option>
-                  <option value="GR_250">Por bolsa de 250 gramos</option>
-                  <option value="DOCENA">Por docena</option>
-                  <option value="UNIDAD">Por unidad</option>
-                  <option value="MANOJO">Por manojo</option>
-                  <option value="BULTO_5KG">Por bulto (5 kg)</option>
-                  <option value="BULTO_10KG">Por bulto (10 kg)</option>
-                  <option value="CANASTILLA_20KG">Por canastilla (20 kg)</option>
-                  <option value="LITRO">Por litro</option>
-                  <option value="ML_500">Por 500 ml</option>
-                  <option value="ML_250">Por 250 ml</option>
+                  <option value="">
+                    {loadingBases ? "Cargando productos..." : "Selecciona un producto"}
+                  </option>
+                  {productBases?.map((base) => (
+                    <option key={base.id} value={base.id}>
+                      {base.name} - {base.category}
+                    </option>
+                  ))}
                 </select>
-
-                {errors.saleUnit && (
-                  <span className="product-form__error">{errors.saleUnit}</span>
+                {errors.productBaseId && (
+                  <span className="product-form__error">{errors.productBaseId}</span>
                 )}
-
+                {errorBases && (
+                  <span className="product-form__error">Error al cargar productos base</span>
+                )}
                 <small className="product-form__hint">
-                  Elige la presentación exacta con la que quieres vender este producto.
+                  Selecciona el tipo de producto que vas a ofrecer
                 </small>
               </div>
 
-
-              {/* CAMPO 5B: Precio por Unidad de Venta (¡CORRECCIÓN AQUÍ!) */}
               <div className="product-form__field">
-                <label htmlFor="price" className="product-form__label">
-                  Precio por unidad de venta ($) *
+                <label htmlFor="name" className="product-form__label">
+                  Nombre de tu oferta *
                 </label>
                 <input
-                  type="number"
-                  id="price"
-                  name="price"
-                  value={formData.price}
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  className={`product-form__input ${errors.price ? "product-form__input--error" : ""}`}
-                  placeholder="Ej: 5000"
-                  step="0.01"
-                  min="0.01"
+                  className={`product-form__input ${errors.name ? "product-form__input--error" : ""}`}
+                  placeholder="Ej: Tomate Orgánico Chonto - Finca La Esperanza"
                   disabled={isSubmitting}
                 />
-                {errors.price && (
-                  <span className="product-form__error">{errors.price}</span>
+                {errors.name && (
+                  <span className="product-form__error">{errors.name}</span>
                 )}
                 <small className="product-form__hint">
-                  Precio al público para la unidad que seleccionaste (ej: el precio de 1 kg).
+                  Dale un nombre único a tu oferta para diferenciarte
                 </small>
+              </div>
+
+              <div className="product-form__field">
+                <label htmlFor="description" className="product-form__label">
+                  Descripción *
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className={`product-form__textarea ${errors.description ? "product-form__textarea--error" : ""}`}
+                  placeholder="Ej: Tomates frescos, cultivados sin pesticidas. Perfectos para ensaladas."
+                  rows={4}
+                  disabled={isSubmitting}
+                />
+                {errors.description && (
+                  <span className="product-form__error">{errors.description}</span>
+                )}
+              </div>
+
+              <div className="product-form__field">
+                <label htmlFor="imageUrl" className="product-form__label">
+                  Link de imagen *
+                </label>
+                <input
+                  type="url"
+                  id="imageUrl"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleInputChange}
+                  className={`product-form__input ${errors.imageUrl ? "product-form__input--error" : ""}`}
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  disabled={isSubmitting}
+                />
+                {errors.imageUrl && (
+                  <span className="product-form__error">{errors.imageUrl}</span>
+                )}
               </div>
             </div>
 
-            <div className="product-form__field">
-              <label className="product-form__checkbox-label">
-                <input
-                  type="checkbox"
-                  name="isAvailable"
-                  checked={formData.isAvailable}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-                <span>Producto disponible para la venta</span>
-              </label>
+            {/* === SECCIÓN 2: PRESENTACIÓN DE VENTA === */}
+            <div className="product-form__section">
+              <div className="product-form__section-header">
+                <h3 className="product-form__section-title">Presentación de Venta</h3>
+              </div>
+              <p className="product-form__section-description">
+                Define cómo verá el cliente tu producto en la tienda
+              </p>
+
+              <div className="product-form__row">
+                <div className="product-form__field product-form__field--half">
+                  <label htmlFor="quantity" className="product-form__label">
+                    Cantidad por venta *
+                  </label>
+                  <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    value={formData.quantity}
+                    onChange={handleInputChange}
+                    className={`product-form__input ${errors.quantity ? "product-form__input--error" : ""}`}
+                    placeholder="Ej: 1"
+                    step="0.01"
+                    min="0.01"
+                    disabled={isSubmitting}
+                  />
+                  {errors.quantity && (
+                    <span className="product-form__error">{errors.quantity}</span>
+                  )}
+                  <small className="product-form__hint">
+                    ¿Cuántas unidades vendes por cada compra?
+                  </small>
+                </div>
+
+                <div className="product-form__field product-form__field--half">
+                  <label htmlFor="unit" className="product-form__label">
+                    Unidad *
+                  </label>
+                  <select
+                    id="unit"
+                    name="unit"
+                    value={formData.unit}
+                    onChange={handleInputChange}
+                    className={`product-form__select ${errors.unit ? "product-form__select--error" : ""}`}
+                    disabled={isSubmitting}
+                  >
+                    <option value="">Selecciona unidad</option>
+                    {UNITS.map((u) => (
+                      <option key={u.value} value={u.value}>
+                        {u.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.unit && (
+                    <span className="product-form__error">{errors.unit}</span>
+                  )}
+                  <small className="product-form__hint">
+                    ¿En qué unidad se mide?
+                  </small>
+                </div>
+              </div>
+
+              <div className="product-form__row">
+                <div className="product-form__field">
+                  <label htmlFor="price" className="product-form__label">
+                    Precio ($) *
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    className={`product-form__input ${errors.price ? "product-form__input--error" : ""}`}
+                    placeholder="Ej: 5000"
+                    step="0.01"
+                    min="0.01"
+                    disabled={isSubmitting}
+                  />
+                  {errors.price && (
+                    <span className="product-form__error">{errors.price}</span>
+                  )}
+                  <small className="product-form__hint">
+                    Precio por la presentación configurada arriba
+                  </small>
+                </div>
+              </div>
+
+              {/* Vista previa DEBAJO del precio */}
+              {formData.quantity && formData.unit && formData.name && (
+                <div className="product-form__unit-info">
+                  📢 <strong>Vista previa:</strong> Vendes <strong>{formData.quantity} {getUnitLabel(formData.unit, parseFloat(formData.quantity))}</strong> de <strong>{formData.name || 'tu producto'}</strong>{formData.price ? ` por ${parseFloat(formData.price).toLocaleString('es-CO')}` : ''}
+                  {salesPerKilo && (
+                    <div style={{ marginTop: '4px', fontStyle: 'italic', color: '#059669' }}>
+                      💡 Se descontará 1 kg de inventario cada {salesPerKilo} venta{parseFloat(salesPerKilo) > 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="product-form__actions">

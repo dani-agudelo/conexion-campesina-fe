@@ -2,7 +2,7 @@ import React from 'react';
 import ProductCard from '../ProductCard';
 import './ProductList.css';
 
-const ProductList = ({ products, loading, onEdit, onDelete }) => {
+const ProductList = ({ products, loading, onEdit, onDelete, onAddInventory }) => {
   if (loading) {
     return (
       <div className="product-list">
@@ -36,6 +36,8 @@ const ProductList = ({ products, loading, onEdit, onDelete }) => {
               <th className="product-list__header-cell">DESCRIPCIÓN</th>
               <th className="product-list__header-cell">PRECIO</th>
               <th className="product-list__header-cell">CANTIDAD</th>
+              <th className="product-list__header-cell">ESTADO</th>
+              <th className="product-list__header-cell">DISPONIBILIDAD</th>
               <th className="product-list__header-cell">ACCIONES</th>
             </tr>
           </thead>
@@ -46,6 +48,7 @@ const ProductList = ({ products, loading, onEdit, onDelete }) => {
                 product={product}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onAddInventory={onAddInventory}
               />
             ))}
           </tbody>

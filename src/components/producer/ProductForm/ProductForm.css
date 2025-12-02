@@ -111,7 +111,7 @@
 .product-form__label {
   font-weight: 600;
   color: #2c3e50;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .product-form__input,
@@ -341,4 +341,48 @@
   .product-form__input-suffix {
     right: 14px;
   }
+}
+
+.product-form__unit-info {
+  margin-top: 15px;
+  color: #555;
+  font-size: 0.85rem;
+}
+/* Agregar al final de ProductForm.css */
+
+/* Secciones del formulario */
+.product-form__section {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.product-form__section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.product-form__section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.product-form__section-icon {
+  font-size: 1.5rem;
+}
+
+.product-form__section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.product-form__section-description {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: -8px 0 16px 0;
+  line-height: 1.4;
 }

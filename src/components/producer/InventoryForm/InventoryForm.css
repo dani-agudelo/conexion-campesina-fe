@@ -16,3 +16,34 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Agregar esto a tu InventoryForm.css */
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.product-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.product-form__hint {
+  display: block;
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.product-form__save-btn:disabled,
+.product-form__cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+}
