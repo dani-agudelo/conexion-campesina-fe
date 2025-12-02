@@ -6,13 +6,13 @@ export const useProductProducerQuery = () => {
   return useQuery({
     queryKey: ["productData"],
     queryFn: getProductsProducer,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 10
   });
 };
 
 export const useCreateProductMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (productData) => createProduct(productData),
     onSuccess: () => {
@@ -27,7 +27,7 @@ export const useCreateProductMutation = () => {
 
 export const useUpdateProductMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ productId, productData }) => updateProduct(productId, productData),
     onSuccess: () => {
@@ -43,7 +43,7 @@ export const useUpdateProductMutation = () => {
 
 export const useDeleteProductMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (productId) => deleteProduct(productId),
     onSuccess: () => {
@@ -62,6 +62,6 @@ export const useProductByIdQuery = (productId) => {
     queryKey: ["productById", productId],
     queryFn: () => getProductById(productId),
     enabled: !!productId,
-    staleTime: 1000 * 60 * 5,
+     staleTime: 1000 * 10
   });
 }

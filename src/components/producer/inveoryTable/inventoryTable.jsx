@@ -31,6 +31,7 @@ const getInventoryStatus = (available, min, max) => {
 const App = () => {
     const navigate = useNavigate();
     const { data: inventory = [], isPending, isError, error } = useProducerInventoryQuery();
+    
     const deleteMutation = useDeleteInventoryMutation();
 
     const [showModal, setShowModal] = useState(false);
@@ -71,6 +72,7 @@ const App = () => {
     };
 
     let content;
+    
 
     if (isPending) {
         content = (
