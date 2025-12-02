@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProductList from "../../components/producer/ProductList";
 import ProductForm from "../../components/producer/ProductForm";
 import InventoryForm from "../../components/producer/InventoryForm";
@@ -13,6 +14,7 @@ import { showSuccessAlert, showConfirmDialog, showErrorAlert } from "../../utils
 import { useCreateInventoryMutation } from "../../hooks/query/useCreateInventory";
 
 const ProductsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showForm, setShowForm] = useState(false);
 
   const [showInventoryForm, setShowInventoryForm] = useState(false);
@@ -24,6 +26,7 @@ const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { isPending, error, data } = useProductProducerQuery();
+  console.log("Productos del productor:", data);
   const createProductMutation = useCreateProductMutation();
   const updateProductMutation = useUpdateProductMutation();
   const deleteProductMutation = useDeleteProductMutation();
@@ -31,6 +34,16 @@ const ProductsPage = () => {
 
   const products = data || [];
   const loading = isPending;
+
+  // Detectar parámetro de URL y abrir modal
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'create') {
+      setShowForm(true);
+      // Limpiar el parámetro de la URL
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleAddProduct = () => {
     setEditingProduct(null);
@@ -44,7 +57,10 @@ const ProductsPage = () => {
   };
 
   const handleDeleteProduct = async (productId) => {
-    const confirmed = await showConfirmDialog("¿Deseas eliminar este producto?");
+    const confirmed = await showConfirmDialog(
+      "¿Deseas eliminar este producto?",
+      "Esta acción también eliminará su inventario asociado si existe."
+    );
 
     if (confirmed) {
       try {
@@ -52,6 +68,7 @@ const ProductsPage = () => {
         showSuccessAlert("Producto eliminado exitosamente");
       } catch (error) {
         console.error("Error al eliminar producto:", error);
+        showErrorAlert("No se pudo eliminar el producto");
       }
     }
   };
@@ -59,6 +76,7 @@ const ProductsPage = () => {
   const handleProductFormSubmit = async (productData) => {
     try {
       if (editingProduct) {
+        // Modo edición: solo actualizar producto
         await updateProductMutation.mutateAsync({
           productId: editingProduct.id,
           productData: productData
@@ -67,6 +85,7 @@ const ProductsPage = () => {
         setShowForm(false);
         setEditingProduct(null);
       } else {
+        // Modo creación: crear producto y luego inventario
         const response = await createProductMutation.mutateAsync(productData);
 
         const newId = response.id || response.data?.id;
@@ -76,15 +95,18 @@ const ProductsPage = () => {
           setShowForm(false);
           setShowInventoryForm(true);
         } else {
-          showErrorAlert("No se pudo crear el producto, intenta más tarde")
+          showErrorAlert("No se pudo crear el producto, intenta más tarde");
         }
       }
     } catch (error) {
       console.error("Error al guardar el producto:", error);
+      showErrorAlert("Error al guardar el producto");
     }
   };
 
   const handleInventoryFormSubmit = async (inventoryData) => {
+    console.log("Datos de inventario recibidos:", inventoryData);
+
     const payload = {
       productOfferId: inventoryData.productOfferId,
       available_quantity: inventoryData.quantity,
@@ -95,7 +117,7 @@ const ProductsPage = () => {
 
     try {
       await createInventoryMutation.mutateAsync(payload);
-      showSuccessAlert("Inventario creado exitosamente");
+      showSuccessAlert("¡Producto e inventario creados! Ya está listo para la venta.");
     } catch (error) {
       console.error("Error al crear inventario:", error);
       showErrorAlert("No se pudo crear el inventario");
@@ -105,16 +127,28 @@ const ProductsPage = () => {
     setCreatedProductId(null);
   };
 
-
-
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingProduct(null);
   };
 
-  const handleCloseInventoryForm = () => {
-    setShowInventoryForm(false);
-    setCreatedProductId(null);
+  const handleCloseInventoryForm = (saved = false) => {
+
+    if (saved === true) {
+      setShowInventoryForm(false);
+      setCreatedProductId(null);
+      return; 
+    }
+
+    showConfirmDialog(
+      "¿Cancelar configuración de inventario?",
+      "El producto se creó pero no estará disponible para venta sin inventario."
+    ).then((confirmed) => {
+      if (confirmed) {
+        setShowInventoryForm(false);
+        setCreatedProductId(null);
+      }
+    });
   };
 
   const handleSearch = (term) => {
@@ -163,7 +197,7 @@ const ProductsPage = () => {
           onClick={handleAddProduct}
         >
           <span className="producer-products__add-icon">+</span>
-          Agregar Producto
+          Crear Producto
         </button>
       </div>
 
@@ -265,7 +299,7 @@ const ProductsPage = () => {
         <InventoryForm
           productOfferId={createdProductId}
           onSave={handleInventoryFormSubmit}
-          onCancel={handleCloseInventoryForm}
+          onClose={handleCloseInventoryForm}
         />
       )}
     </div>

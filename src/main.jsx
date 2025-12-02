@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/payment/success",
-            element: <PaymentSuccessPage />, // No necesita ProtectedRoute
+            element: <PaymentSuccessPage />, 
           },
           {
             path: "/users",
@@ -91,6 +91,14 @@ const router = createBrowserRouter([
             path: "/product-management",
             element: <Navigate to="/product-management/products" replace />,
           },
+          {
+            path: "/product-management/inventory",
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
+                <InventoryPage />
+              </ProtectedRoute>
+            ),
+          }
         ],
       },
 
@@ -125,7 +133,7 @@ const router = createBrowserRouter([
             path: "/product-management/inventory",
             element: (
               <ProtectedRoute allowedRoles={[UserRole.PRODUCER]}>
-                <InventoryPage />   {/* tu componente */}
+                <InventoryPage />
               </ProtectedRoute>
             ),
           },

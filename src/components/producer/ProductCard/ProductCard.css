@@ -15,6 +15,7 @@
 .product-card__product {
   padding: 16px 20px;
   display: table-cell !important;
+  vertical-align: middle;
 }
 
 .product-card__product-info {
@@ -66,8 +67,8 @@
 
 .product-card__description {
   padding: 16px 20px;
-  max-width: 350px;
   display: table-cell !important;
+  vertical-align: middle;
 }
 
 .product-card__description-text {
@@ -83,8 +84,9 @@
 
 .product-card__price {
   padding: 16px 20px;
-  text-align: right;
+  text-align: center;
   display: table-cell !important;
+  vertical-align: middle;
 }
 
 .product-card__price-amount {
@@ -103,6 +105,7 @@
   padding: 16px 20px;
   text-align: center;
   display: table-cell !important;
+  vertical-align: middle;
 }
 
 .product-card__quantity-amount {
@@ -117,9 +120,37 @@
   color: #6c757d;
 }
 
+.product-card__availability {
+  padding: 16px 20px;
+  text-align: center;
+  display: table-cell !important;
+  vertical-align: middle;
+}
+
+.product-card__availability--yes {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #d4edda;
+  color: #155724;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.product-card__availability--no {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #f8d7da;
+  color: #721c24;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .product-card__actions {
   padding: 16px 20px;
   display: table-cell !important;
+  vertical-align: middle;
 }
 
 .product-card__action-buttons {
@@ -139,6 +170,7 @@
   justify-content: center;
   transition: all 0.2s ease;
   background: white;
+  border: 1px solid #e9ecef;
 }
 
 .product-card__action-btn--edit {
@@ -149,6 +181,7 @@
   background: #3FD411;
   color: white;
   transform: translateY(-1px);
+  border-color: #3FD411;
 }
 
 .product-card__action-btn--delete {
@@ -159,6 +192,7 @@
   background: #dc3545;
   color: white;
   transform: translateY(-1px);
+  border-color: #dc3545;
 }
 
 .product-card__action-btn svg {
@@ -172,6 +206,7 @@
   .product-card__description,
   .product-card__price,
   .product-card__quantity,
+  .product-card__availability,
   .product-card__actions {
     padding: 12px 15px;
   }
@@ -195,7 +230,7 @@
   }
   
   .product-card__price-amount {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   .product-card__quantity-amount {
@@ -218,6 +253,7 @@
   .product-card__description,
   .product-card__price,
   .product-card__quantity,
+  .product-card__availability,
   .product-card__actions {
     padding: 10px 12px;
   }
@@ -236,10 +272,6 @@
     padding: 1px 6px;
   }
   
-  .product-card__description {
-    max-width: 200px;
-  }
-  
   .product-card__action-btn {
     width: 28px;
     height: 28px;
@@ -248,5 +280,53 @@
   .product-card__action-btn svg {
     width: 12px;
     height: 12px;
+  }
+}
+
+/* Agregar al final de ProductCard.css */
+
+/* Estado del producto (Activo/Inactivo) */
+.product-card__status {
+  padding: 16px 20px;
+  text-align: center;
+  display: table-cell !important;
+  vertical-align: middle;
+}
+
+.product-card__status--active {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #d4edda;
+  color: #155724;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.product-card__status--inactive {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #fff3cd;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Botón de agregar a inventario */
+.product-card__action-btn--inventory {
+  color: #3FD411;
+}
+
+.product-card__action-btn--inventory:hover {
+  background: #3FD411;
+  color: white;
+  transform: translateY(-1px);
+  border-color: #3FD411;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-card__status {
+    padding: 12px 15px;
   }
 }

@@ -26,7 +26,7 @@ const CatalogProducts = () => {
       if (category !== 'Todas') {
         return await fetcher(`product/offer/category/${encodeURIComponent(category)}`)
       }
-      return await fetcher('product/offer') // todos los productos
+      return await fetcher('product/offer/catalog') // todos los productos
     },
     staleTime: 1000 * 60 * 5,
   })
