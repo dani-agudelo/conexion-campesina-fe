@@ -35,7 +35,7 @@ export const useProducerInventoryQuery = () => {
       console.log(data);
       return data.map(item => ({
         ...item,
-        name: item.product_name || 'Producto sin nombre', 
+        name: item.product_name || 'Producto sin nombre',
         available: Number(item.available_quantity?.toFixed(2) ?? 0),
         minThreshold: item.minimum_threshold,
         maxCapacity: item.maximum_capacity,
@@ -50,7 +50,7 @@ export const useProducerInventoryQuery = () => {
 // Mutation para crear inventario
 export const useCreateInventoryMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (createInventoryDto) => {
       return await fetcher('inventory', {
@@ -68,7 +68,7 @@ export const useCreateInventoryMutation = () => {
 // Mutation para actualizar inventario
 export const useUpdateInventoryMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async ({ id, updateInventoryDto }) => {
       return await fetcher(`inventory/${id}`, {
@@ -86,7 +86,7 @@ export const useUpdateInventoryMutation = () => {
 // Mutation para eliminar inventario
 export const useDeleteInventoryMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (id) => {
       return await fetcher(`inventory/${id}`, {

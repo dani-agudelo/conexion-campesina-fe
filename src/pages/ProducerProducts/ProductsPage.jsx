@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from '@tanstack/react-query';
 import ProductList from "../../components/producer/ProductList";
 import ProductForm from "../../components/producer/ProductForm";
 import InventoryForm from "../../components/producer/InventoryForm";
@@ -15,10 +16,14 @@ import { useCreateInventoryMutation } from "../../hooks/query/useCreateInventory
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient(); // AGREGAR ESTO
   const [showForm, setShowForm] = useState(false);
 
   const [showInventoryForm, setShowInventoryForm] = useState(false);
   const [createdProductId, setCreatedProductId] = useState(null);
+
+  // Estado para manejar el inventario desde la lista
+  const [showInventoryFormForProduct, setShowInventoryFormForProduct] = useState(null);
 
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +31,6 @@ const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { isPending, error, data } = useProductProducerQuery();
-  console.log("Productos del productor:", data);
   const createProductMutation = useCreateProductMutation();
   const updateProductMutation = useUpdateProductMutation();
   const deleteProductMutation = useDeleteProductMutation();
@@ -35,12 +39,17 @@ const ProductsPage = () => {
   const products = data || [];
   const loading = isPending;
 
+  // Debug: Ver todas las queries activas
+  useEffect(() => {
+    const queries = queryClient.getQueryCache().getAll();
+    console.log('Queries activas:', queries.map(q => q.queryKey));
+  }, [queryClient]);
+
   // Detectar parámetro de URL y abrir modal
   useEffect(() => {
     const action = searchParams.get('action');
     if (action === 'create') {
       setShowForm(true);
-      // Limpiar el parámetro de la URL
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
@@ -76,7 +85,6 @@ const ProductsPage = () => {
   const handleProductFormSubmit = async (productData) => {
     try {
       if (editingProduct) {
-        // Modo edición: solo actualizar producto
         await updateProductMutation.mutateAsync({
           productId: editingProduct.id,
           productData: productData
@@ -85,9 +93,7 @@ const ProductsPage = () => {
         setShowForm(false);
         setEditingProduct(null);
       } else {
-        // Modo creación: crear producto y luego inventario
         const response = await createProductMutation.mutateAsync(productData);
-
         const newId = response.id || response.data?.id;
 
         if (newId) {
@@ -105,8 +111,6 @@ const ProductsPage = () => {
   };
 
   const handleInventoryFormSubmit = async (inventoryData) => {
-    console.log("Datos de inventario recibidos:", inventoryData);
-
     const payload = {
       productOfferId: inventoryData.productOfferId,
       available_quantity: inventoryData.quantity,
@@ -117,6 +121,10 @@ const ProductsPage = () => {
 
     try {
       await createInventoryMutation.mutateAsync(payload);
+      
+      // INVALIDAR LA QUERY DE PRODUCTOS PARA REFRESCAR
+      await queryClient.invalidateQueries({ queryKey: ['producer-products'] });
+      
       showSuccessAlert("¡Producto e inventario creados! Ya está listo para la venta.");
     } catch (error) {
       console.error("Error al crear inventario:", error);
@@ -133,13 +141,14 @@ const ProductsPage = () => {
   };
 
   const handleCloseInventoryForm = (saved = false) => {
-
-    if (saved === true) {
+    // Si se guardó exitosamente, cerrar sin preguntar
+    if (saved) {
       setShowInventoryForm(false);
       setCreatedProductId(null);
-      return; 
+      return;
     }
 
+    // Si se canceló, preguntar confirmación
     showConfirmDialog(
       "¿Cancelar configuración de inventario?",
       "El producto se creó pero no estará disponible para venta sin inventario."
@@ -149,6 +158,41 @@ const ProductsPage = () => {
         setCreatedProductId(null);
       }
     });
+  };
+
+  // Handler para agregar inventario desde la lista (botón 📦)
+  const handleAddInventory = (productId) => {
+    setShowInventoryFormForProduct(productId);
+  };
+
+  // Handler para cerrar el formulario de inventario desde la lista
+  const handleCloseInventoryFormFromList = () => {
+    // Desde la lista es opcional, así que no preguntamos
+    setShowInventoryFormForProduct(null);
+  };
+
+  // Handler para guardar inventario desde la lista
+  const handleInventoryFormSubmitFromList = async (inventoryData) => {
+    const payload = {
+      productOfferId: inventoryData.productOfferId,
+      available_quantity: inventoryData.quantity,
+      unit: inventoryData.unit,
+      minimum_threshold: inventoryData.minThreshold,
+      maximum_capacity: inventoryData.maxCapacity
+    };
+
+    try {
+      await createInventoryMutation.mutateAsync(payload);
+      
+      // INVALIDAR LA QUERY DE PRODUCTOS PARA REFRESCAR
+      await queryClient.invalidateQueries({ queryKey: ['producer-products'] });
+      
+      showSuccessAlert("Inventario creado exitosamente. ¡Producto ahora activo!");
+      setShowInventoryFormForProduct(null);
+    } catch (error) {
+      console.error("Error al crear inventario:", error);
+      showErrorAlert("No se pudo crear el inventario");
+    }
   };
 
   const handleSearch = (term) => {
@@ -249,6 +293,7 @@ const ProductsPage = () => {
           loading={loading || createProductMutation.isPending}
           onEdit={handleEditProduct}
           onDelete={handleDeleteProduct}
+          onAddInventory={handleAddInventory}
         />
       )}
 
@@ -287,6 +332,7 @@ const ProductsPage = () => {
         </div>
       )}
 
+      {/* Modal de producto (crear/editar) */}
       {showForm && (
         <ProductForm
           product={editingProduct}
@@ -295,11 +341,21 @@ const ProductsPage = () => {
         />
       )}
 
+      {/* Modal de inventario (después de crear producto) */}
       {showInventoryForm && (
         <InventoryForm
           productOfferId={createdProductId}
           onSave={handleInventoryFormSubmit}
           onClose={handleCloseInventoryForm}
+        />
+      )}
+
+      {/* Modal de inventario (desde la lista de productos - botón 📦) */}
+      {showInventoryFormForProduct && (
+        <InventoryForm
+          productOfferId={showInventoryFormForProduct}
+          onSave={handleInventoryFormSubmitFromList}
+          onClose={handleCloseInventoryFormFromList}
         />
       )}
     </div>
